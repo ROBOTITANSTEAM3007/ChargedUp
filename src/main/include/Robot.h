@@ -27,22 +27,22 @@ class Robot : public frc::TimedRobot {
         void SimulationInit() override;
         void SimulationPeriodic() override;
 
-        void onDriveRequest(double); 
+        double joystick_deadzone = 0.1;
+        double joystick_sensitivity = 1;
 
         //IDs for someone else to figure out
         //sticks
-        static unsigned const short otherJoystickID = 0;
-        static unsigned const short driveJoystickID = 1;
+        short drive_joystick = 1;
 
         //sparkmax
-        unsigned const short rightDriveMotorID = 1;
-        unsigned const short leftDrivemotorID = 2;
+        short right_drive_motor_ID = 1;
+        short left_drive_motor_ID = 2;
 
-        rev::CANSparkMax m_rightDriveMotor{rightDriveMotorID, rev::CANSparkMax::MotorType::kBrushless};
-        rev::CANSparkMax m_leftDriveMotor{leftDrivemotorID, rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax m_rightDriveMotor{right_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax m_leftDriveMotor{left_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
         frc::DifferentialDrive m_robotDrive{m_leftDriveMotor, m_rightDriveMotor};
-        frc::Joystick m_driveStick{driveJoystickID};
+        frc::Joystick m_driveStick{drive_joystick};
 
     private:
         frc::SendableChooser<std::string> m_chooser;

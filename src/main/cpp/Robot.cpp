@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Robot.h"
-#include "Drive.h"
 
 #include <fmt/core.h>
 
@@ -12,11 +11,9 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
-void Robot::onDriveRequest(double sens = Drive::stickSensitivity) {
-    if (abs(m_driveStick.GetTwist()) >= Drive::stickDeadzone || abs(m_driveStick.GetY()) >= Drive::stickDeadzone) {
-        m_robotDrive.ArcadeDrive(m_driveStick.GetTwist() * sens, -m_driveStick.GetY() * sens);
-    }
-}
+
+
+
 
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
@@ -70,7 +67,14 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {}
 
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+        frc::SmartDashboard::PutNumber("WOkring", 0);
+    
+    if (fabs(m_driveStick.GetTwist()) >= joystick_deadzone || fabs(m_driveStick.GetY()) >= joystick_deadzone) {
+            frc::SmartDashboard::PutNumber("WOkring", 1);
+        m_robotDrive.ArcadeDrive(m_driveStick.GetTwist() * joystick_sensitivity, -m_driveStick.GetY() * joystick_sensitivity);
+    }
+}
 
 void Robot::DisabledInit() {}
 
