@@ -2,22 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Robot.h"
-#include "Drive.h"
+#include <Robot.h>
+#include <Drive.h>
 
 #include <fmt/core.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
-
+#include <rev/CANSparkMax.h>
+#include <frc/drive/DifferentialDrive.h>
+#include <frc/TimedRobot.h>
+#include <frc/smartdashboard/SendableChooser.h>
 void Robot::onDriveRequest(double sens = Drive::stickSensitivity) {
     if (abs(m_driveStick.GetTwist()) >= Drive::stickDeadzone || abs(m_driveStick.GetY()) >= Drive::stickDeadzone) {
         m_robotDrive.ArcadeDrive(m_driveStick.GetTwist() * sens, -m_driveStick.GetY() * sens);
     }
 }
+
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+    m_leftDriveMotor.RestoreFactoryDefaults();
+    m_rightDriveMotor.RestoreFactoryDefaults();
 }
 
 /**

@@ -7,6 +7,9 @@
 #include <string>
 
 #include <frc/TimedRobot.h>
+#include <rev/CANSparkMax.h>
+#include <frc/drive/DifferentialDrive.h>
+#include <frc/Joystick.h>
 #include <frc/smartdashboard/SendableChooser.h>
 
 class Robot : public frc::TimedRobot {
@@ -29,7 +32,7 @@ class Robot : public frc::TimedRobot {
         //IDs for someone else to figure out
         //sticks
         unsigned const short otherJoystickID = 0;
-        unsigned const short driveJoystickID = 1;
+        static unsigned const short driveJoystickID = 1;
 
         //sparkmax
         unsigned const short rightDriveMotorID = 1;

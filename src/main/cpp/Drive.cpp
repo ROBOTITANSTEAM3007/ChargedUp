@@ -1,11 +1,15 @@
-#include "Drive.h"
+#include <Drive.h>
 
-void Drive::sparkMax(rev::CANSparkMax* leftSide, rev::CANSparkMax* rightSide) {
+Drive::Drive(rev::CANSparkMax* leftSide, rev::CANSparkMax* rightSide) {
     rightMaxDrive = rightSide;
     leftMaxDrive = leftSide;
 }
+Drive::Drive(frc::Spark* leftSide, frc::Spark* rightSide) {
+    rightSparkDrive = rightSide;
+    leftSparkDrive = leftSide;
+}
 
-void Drive::drive(float x, float y) {
+void Drive::vroom(float x,  float y) {
     /* we probably dont need this since we already check if the inputs exceed the deadzone
     if (x < 0.1 && x > -0.1) {
         x = 0;
