@@ -10,8 +10,8 @@ class Drive {
         //void frcSpark(frc::Spark* leftSide, frc::Spark* rightSide);
         void drive(float x, float y);
 
-        static const double stickDeadzone = 0.1;
-        static const double stickSensitivity = 1;
+        static inline double stickDeadzone = 0.1;
+        static inline double stickSensitivity = 1;
 
     protected
         rev::CANSparkMax* rightMaxDrive;
