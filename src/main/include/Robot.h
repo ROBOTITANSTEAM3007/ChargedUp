@@ -31,7 +31,7 @@ class Robot : public frc::TimedRobot {
 
         //IDs for someone else to figure out
         //sticks
-        unsigned const short otherJoystickID = 0;
+        static unsigned const short otherJoystickID = 0;
         static unsigned const short driveJoystickID = 1;
 
         //sparkmax
