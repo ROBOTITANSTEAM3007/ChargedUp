@@ -18,12 +18,14 @@
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+
     m_leftDriveMotor.RestoreFactoryDefaults();
     m_rightDriveMotor.RestoreFactoryDefaults();
     m_leftLagMotor.RestoreFactoryDefaults();
     m_rightLagMotor.RestoreFactoryDefaults();
-    
+
     m_leftLagMotor.Follow(m_leftDriveMotor);
     m_rightLagMotor.Follow(m_rightDriveMotor);
 }
@@ -51,8 +53,7 @@ void Robot::RobotPeriodic() {}
  */
 void Robot::AutonomousInit() {
     m_autoSelected = m_chooser.GetSelected();
-        //m_autoSelected = SmartDashboard::GetString("Auto Selector",
-        //kAutoNameDefault);
+        m_autoSelected = frc::SmartDashboard::GetString("Auto Selector", kAutoNameDefault);
     fmt::print("Auto selected: {}\n", m_autoSelected);
 
     if (m_autoSelected == kAutoNameCustom) {
