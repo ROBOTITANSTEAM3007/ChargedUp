@@ -37,9 +37,13 @@ class Robot : public frc::TimedRobot {
         //sparkmax
         short right_drive_motor_ID = 1;
         short left_drive_motor_ID = 2;
+        short right_lag_motor_ID = 3;
+        short left_lag_motor_ID = 4;
 
         rev::CANSparkMax m_rightDriveMotor{right_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
         rev::CANSparkMax m_leftDriveMotor{left_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax m_rightLagMotor{right_lag_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax m_leftLagMotor{left_lag_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
         frc::DifferentialDrive m_robotDrive{m_leftDriveMotor, m_rightDriveMotor};
         frc::Joystick m_driveStick{drive_joystick};
