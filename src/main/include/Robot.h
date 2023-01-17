@@ -6,11 +6,16 @@
 
 #include <string>
 
-#include <frc/TimedRobot.h>
+#include <fmt/core.h>
+
 #include <rev/CANSparkMax.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/Joystick.h>
+
+#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/drive/MecanumDrive.h>
+
+#include <Joystick.h>
 
 class Robot : public frc::TimedRobot {
     public:
@@ -27,22 +32,28 @@ class Robot : public frc::TimedRobot {
         void SimulationInit() override;
         void SimulationPeriodic() override;
 
-        double joystick_deadzone = 0.1;
-        double joystick_sensitivity = 1;
+        // MOTORS
 
-        //IDs for someone else to figure out
-        //sticks
-        short drive_joystick = 1;
+        // Right Side
+        short front_right_motor_ID = 1;
+        short back_right_motor_ID = 3;
 
-        //sparkmax
-        short right_drive_motor_ID = 1;
-        short left_drive_motor_ID = 2;
+        // Left Side
+        short front_left_motor_ID = 2;
+        short back_left_motor_ID = 4;
 
-        rev::CANSparkMax m_rightDriveMotor{right_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
-        rev::CANSparkMax m_leftDriveMotor{left_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        // Initalize
+        rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax back_right_motor{back_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax front_left_motor{front_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax back_left_motor{back_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
-        frc::DifferentialDrive m_robotDrive{m_leftDriveMotor, m_rightDriveMotor};
-        frc::Joystick m_driveStick{drive_joystick};
+        // DRIVE
+        frc::MecanumDrive drive_train{front_left_motor, back_left_motor, front_right_motor, back_right_motor};
+
+        // STICKS
+        // Drive Stick
+        Joystick drive_joystick{0, 0.1, 1};
 
     private:
         frc::SendableChooser<std::string> m_chooser;

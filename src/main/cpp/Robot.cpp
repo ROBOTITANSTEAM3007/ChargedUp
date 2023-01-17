@@ -4,17 +4,6 @@
 
 #include "Robot.h"
 
-#include <fmt/core.h>
-
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <rev/CANSparkMax.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SendableChooser.h>
-
-
-
-
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
@@ -68,11 +57,17 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-        frc::SmartDashboard::PutNumber("WOkring", 0);
-    
-    if (fabs(m_driveStick.GetTwist()) >= joystick_deadzone || fabs(m_driveStick.GetY()) >= joystick_deadzone) {
-            frc::SmartDashboard::PutNumber("WOkring", 1);
-        m_robotDrive.ArcadeDrive(m_driveStick.GetTwist() * joystick_sensitivity, -m_driveStick.GetY() * joystick_sensitivity);
+    frc::SmartDashboard::PutNumber("Wokring", 0);
+
+    drive_joystick.update();
+
+    if (fabs(drive_joystick.x) >= drive_joystick.deadzone || fabs(drive_joystick.y) >= drive_joystick.deadzone || fabs(drive_joystick.twist) >= drive_joystick.deadzone) {
+        frc::SmartDashboard::PutNumber("Wokring", 1);
+
+        drive_joystick.update(drive_joystick.sensitivity);
+
+
+        drive_train.DriveCartesian(drive_joystick.x, drive_joystick.y, drive_joystick.twist);
     }
 }
 
