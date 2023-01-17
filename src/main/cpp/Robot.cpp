@@ -57,12 +57,17 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    frc::SmartDashboard::PutNumber("WOkring", 0);
-    
-    if (fabs(drive_joystick.object->GetTwist()) >= drive_joystick.deadzone || fabs(drive_joystick.object->GetY()) >= drive_joystick.deadzone) {
-        frc::SmartDashboard::PutNumber("WOkring", 1);
+    frc::SmartDashboard::PutNumber("Wokring", 0);
 
-        robot_drive.ArcadeDrive(drive_joystick.object->GetTwist() * drive_joystick.sensitivity, -drive_joystick.object->GetY() * drive_joystick.sensitivity);
+    drive_joystick.update();
+
+    if (fabs(drive_joystick.x) >= drive_joystick.deadzone || fabs(drive_joystick.y) >= drive_joystick.deadzone || fabs(drive_joystick.twist) >= drive_joystick.deadzone) {
+        frc::SmartDashboard::PutNumber("Wokring", 1);
+
+        drive_joystick.update(drive_joystick.sensitivity);
+
+
+        drive_train.DriveCartesian(drive_joystick.x, drive_joystick.y, drive_joystick.twist);
     }
 }
 

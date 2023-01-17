@@ -14,7 +14,7 @@
 
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/drive/DifferentialDrive.h>
+#include <frc/drive/MecanumDrive.h>
 
 #include <Joystick.h>
 
@@ -33,15 +33,27 @@ class Robot : public frc::TimedRobot {
         void SimulationInit() override;
         void SimulationPeriodic() override;
 
-        //Motors
-        short right_drive_motor_ID = 1;
-        short left_drive_motor_ID = 2;
+        // MOTORS
 
-        rev::CANSparkMax right_drive_motor{right_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
-        rev::CANSparkMax left_drive_motor{left_drive_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        // Right Side
+        short front_right_motor_ID = 1;
+        short back_right_motor_ID = 3;
 
-        frc::DifferentialDrive robot_drive{left_drive_motor, right_drive_motor};
+        // Left Side
+        short front_left_motor_ID = 2;
+        short back_left_motor_ID = 4;
 
+        // Initalize
+        rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax back_right_motor{back_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax front_left_motor{front_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        rev::CANSparkMax back_left_motor{back_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+
+        // DRIVE
+        frc::MecanumDrive drive_train{front_left_motor, back_left_motor, front_right_motor, back_right_motor};
+
+        // STICKS
+        // Drive Stick
         Joystick drive_joystick{0, 0.1, 1};
 
     private:

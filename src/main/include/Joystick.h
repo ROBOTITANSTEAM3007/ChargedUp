@@ -8,7 +8,10 @@ struct Joystick
 
     double 
     deadzone,
-    sensitivity;
+    sensitivity,
+    y,
+    x,
+    twist;
 
     frc::Joystick* object{nullptr};
 
@@ -19,5 +22,12 @@ struct Joystick
         sensitivity = t_sensitivity;
 
         object = new frc::Joystick(t_ID);
+    }
+
+    void update(double sens = 1)
+    {
+        y = object->GetY() * sens;
+        x = object->GetX() * sens;
+        twist = object->GetTwist() * sens;
     }
 };
