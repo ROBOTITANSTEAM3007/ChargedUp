@@ -10,13 +10,10 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
-    m_frontLeft.RestoreFactoryDefaults();
-    m_frontRight.RestoreFactoryDefaults();
-    m_backLeft.RestoreFactoryDefaults();
-    m_backRight.RestoreFactoryDefaults();
-
-    //m_backLeft.Follow(m_frontLeft);
-    //m_backRight.Follow(m_frontRight);
+    front_right_motor.RestoreFactoryDefaults();
+    back_right_motor.RestoreFactoryDefaults();
+    front_left_motor.RestoreFactoryDefaults();
+    back_left_motor.RestoreFactoryDefaults();
 }
 
 /**
