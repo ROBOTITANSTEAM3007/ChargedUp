@@ -7,9 +7,16 @@
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
-    //m_leftDriveMotor.RestoreFactoryDefaults();
-    //m_rightDriveMotor.RestoreFactoryDefaults();
+
+    m_frontLeft.RestoreFactoryDefaults();
+    m_frontRight.RestoreFactoryDefaults();
+    m_backLeft.RestoreFactoryDefaults();
+    m_backRight.RestoreFactoryDefaults();
+
+    //m_backLeft.Follow(m_frontLeft);
+    //m_backRight.Follow(m_frontRight);
 }
 
 /**
@@ -35,8 +42,7 @@ void Robot::RobotPeriodic() {}
  */
 void Robot::AutonomousInit() {
     m_autoSelected = m_chooser.GetSelected();
-        //m_autoSelected = SmartDashboard::GetString("Auto Selector",
-        //kAutoNameDefault);
+        m_autoSelected = frc::SmartDashboard::GetString("Auto Selector", kAutoNameDefault);
     fmt::print("Auto selected: {}\n", m_autoSelected);
 
     if (m_autoSelected == kAutoNameCustom) {
@@ -66,7 +72,8 @@ void Robot::TeleopPeriodic() {
 
         drive_joystick.update(drive_joystick.sensitivity);
 
-
+        //polar or cartesian, we'll use whichever we like more
+        //add fourth parameter for gyro eventually if we want translation independent of where the robot is facing
         drive_train.DriveCartesian(drive_joystick.x, drive_joystick.y, drive_joystick.twist);
     }
 }
