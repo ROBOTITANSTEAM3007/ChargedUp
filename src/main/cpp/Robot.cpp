@@ -18,13 +18,13 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
-    m_leftDriveMotor.RestoreFactoryDefaults();
-    m_rightDriveMotor.RestoreFactoryDefaults();
-    m_leftLagMotor.RestoreFactoryDefaults();
-    m_rightLagMotor.RestoreFactoryDefaults();
+    m_frontLeft.RestoreFactoryDefaults();
+    m_frontRight.RestoreFactoryDefaults();
+    m_backLeft.RestoreFactoryDefaults();
+    m_backRight.RestoreFactoryDefaults();
 
-    m_leftLagMotor.Follow(m_leftDriveMotor);
-    m_rightLagMotor.Follow(m_rightDriveMotor);
+    //m_backLeft.Follow(m_frontLeft);
+    //m_backRight.Follow(m_frontRight);
 }
 
 /**
@@ -71,11 +71,15 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-        frc::SmartDashboard::PutNumber("WOkring", 0);
-    
-    if (fabs(m_driveStick.GetTwist()) >= joystick_deadzone || fabs(m_driveStick.GetY()) >= joystick_deadzone) {
+    frc::SmartDashboard::PutNumber("WOkring", 0);
+    if (fabs(m_driveStick.GetTwist()) >= joystick_deadzone || fabs(m_driveStick.GetY()) >= joystick_deadzone || fabs(m_driveStick.GetX()) >= joystick_deadzone) {
             frc::SmartDashboard::PutNumber("WOkring", 1);
-        m_robotDrive.ArcadeDrive(m_driveStick.GetTwist() * joystick_sensitivity, -m_driveStick.GetY() * joystick_sensitivity);
+        //m_robotDrive.ArcadeDrive(m_driveStick.GetTwist() * joystick_sensitivity, -m_driveStick.GetY() * joystick_sensitivity);
+
+        m_robotDriveMecanum.DriveCartesian(m_driveStick.GetX() * joystick_sensitivity, -m_driveStick.GetY() * joystick_sensitivity, m_driveStick.GetTwist() * joystick_sensitivity);
+        //polar or cartesian, we'll use whichever we like more
+        //add fourth parameter for gyro eventually if we want translation independent of where the robot is facing
+        //m_robotDriveMecanum.DrivePolar(m_driveStick.GetX() * joystick_sensitivity, -m_driveStick.GetY() * joystick_sensitivity, m_driveStick.GetTwist() * joystick_sensitivity);
     }
 }
 
