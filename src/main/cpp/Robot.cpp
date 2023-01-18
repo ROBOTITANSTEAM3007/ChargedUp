@@ -2,11 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+// ARM LAYOUT
+// Hand Motor
+// Claw Pnumatic
+// Shoulder Motor
+
+// Shoulder Encoder
+// 
+
 #include "Robot.h"
+
+#include <iostream>
 
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+
+    frc::SmartDashboard::PutNumber("press", 0);
 
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
@@ -61,7 +73,9 @@ void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
     frc::SmartDashboard::PutNumber("Wokring", 0);
+    frc::SmartDashboard::PutNumber("press", 0);
 
+    button_1.update();
     drive_joystick.update();
 
     if (fabs(drive_joystick.x) >= drive_joystick.deadzone || fabs(drive_joystick.y) >= drive_joystick.deadzone || fabs(drive_joystick.twist) >= drive_joystick.deadzone) {
@@ -72,6 +86,14 @@ void Robot::TeleopPeriodic() {
         //polar or cartesian, we'll use whichever we like more
         //add fourth parameter for gyro eventually if we want translation independent of where the robot is facing
         drive_train.DriveCartesian(drive_joystick.x, drive_joystick.y, drive_joystick.twist);
+    } 
+    else
+    { drive_train.DriveCartesian(0, 0, 0); } // Removes the Error: MecanumDrive... Output not updated often enough.
+    
+    if (button_1.active)
+    {
+        frc::SmartDashboard::PutNumber("press", 1);
+        std::cout << "Active!" << std::endl;
     }
 }
 
