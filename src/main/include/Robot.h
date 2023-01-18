@@ -10,13 +10,13 @@
 
 #include <rev/CANSparkMax.h>
 
-#include <frc/TimedRobot.h>
-#include <frc/drive/MecanumDrive.h>
-
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/drive/MecanumDrive.h>
+#include <frc/TimedRobot.h>
 
 #include <Joystick.h>
+#include <Button.h>
 
 class Robot : public frc::TimedRobot {
     public:
@@ -55,6 +55,11 @@ class Robot : public frc::TimedRobot {
         // STICKS
         // Drive Stick
         Joystick drive_joystick{0, 0.1, 1};
+
+        // 0 = Always detecting input
+        // 1 = Only once on press down            |
+        // 2 = Only once on release               v
+        Button button_1{1, drive_joystick.object, 0};
 
     private:
         frc::SendableChooser<std::string> m_chooser;
