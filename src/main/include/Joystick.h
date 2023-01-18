@@ -6,12 +6,7 @@ struct Joystick
 {
     short ID;
 
-    double 
-    deadzone,
-    sensitivity,
-    y,
-    x,
-    twist;
+    double deadzone, sensitivity, y, x, twist;
 
     frc::Joystick* object{nullptr};
 
