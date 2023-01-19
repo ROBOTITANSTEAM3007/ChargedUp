@@ -75,6 +75,7 @@ void Robot::TeleopPeriodic() {
     frc::SmartDashboard::PutNumber("Wokring", 0);
     frc::SmartDashboard::PutNumber("press", 0);
 
+    button_2.update();
     button_1.update();
     drive_joystick.update();
 
@@ -88,12 +89,26 @@ void Robot::TeleopPeriodic() {
         drive_train.DriveCartesian(drive_joystick.x, drive_joystick.y, drive_joystick.twist);
     } 
     else
-    { drive_train.DriveCartesian(0, 0, 0); } // Removes the Error: MecanumDrive... Output not updated often enough.
-    
+    { drive_train.DriveCartesian(0, 0, 0); } // Removes the Error: MecanumDrive... Output not updated often enough
+
     if (button_1.active)
     {
         frc::SmartDashboard::PutNumber("press", 1);
         std::cout << "Active!" << std::endl;
+    }
+
+    if (button_2.active)
+    {  
+        std::cout << "B2 Active!" << std::endl;
+
+        if (button_1.disabled)
+        {
+            button_1.enable();
+        }
+        else
+        {
+            button_1.disable();   
+        }
     }
 }
 
