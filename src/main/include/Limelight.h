@@ -5,7 +5,7 @@
 
 class Limelight
 {
-    auto Limelight::get_table()
+    static std::shared_ptr<nt::NetworkTable> get_table()
     {
         nt::NetworkTableInstance network_instance = nt::NetworkTableInstance::GetDefault();
 
@@ -13,14 +13,8 @@ class Limelight
     };
 
     static void put_data(const std::string name, double data)
-    {
-        return get_table()
-    }
+    { get_table()->PutNumber(name, data); }
 
-    static double get_data(const std::string, double = 0)
-    {
-
-    }
-
-
+    static double get_data(const std::string name, double fail = 0)
+    { return get_table()->GetNumber(name, fail); }
 };
