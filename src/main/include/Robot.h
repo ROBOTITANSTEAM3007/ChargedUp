@@ -61,7 +61,7 @@ class Robot : public frc::TimedRobot {
         // ALL = Always detecting input
         // PRESS = Only once on press down            
         // RELEASE = Only once on release               
-        Button button_1{1, drive_joystick.object, ALL};
+        Button button_1{1, drive_joystick.object, PRESS};
 
         Button button_2{2, drive_joystick.object, PRESS};
 

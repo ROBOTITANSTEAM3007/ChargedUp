@@ -43,6 +43,13 @@ struct Button
         { active = false; }
     }
 
+    bool is_active()
+    {
+        update();
+
+        return active;
+    }
+
     void disable()
     { disabled = true; }
 
