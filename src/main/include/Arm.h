@@ -1,12 +1,11 @@
 #pragma once
 
-#include <frc/Solenoid.h>
-#include <rev/CANSparkMax.h>
+#include "Robot.h"
 
 class Arm {
     public:
         Arm() {
-                
+            
         }
     private:
         //motors
@@ -24,6 +23,5 @@ class Arm {
         rev::CANSparkMax mtr_shoulder{shoulder_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
         rev::CANSparkMax mtr_hand{wrist_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
         frc::Solenoid claw_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
-
 
 };
