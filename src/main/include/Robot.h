@@ -1,4 +1,5 @@
 // Copyright (c) FIRST and other WPILib contributors.
+
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -17,6 +18,7 @@
 
 #include <Joystick.h>
 #include <Button.h>
+#include <Arm.h>
 
 class Robot : public frc::TimedRobot {
     public:
@@ -36,12 +38,13 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short front_right_motor_ID = 1;
-        short back_right_motor_ID = 3;
+        short 
+        front_right_motor_ID { 1 },
+        back_right_motor_ID { 3 },
 
         // Left Side
-        short front_left_motor_ID = 2;
-        short back_left_motor_ID = 4;
+        front_left_motor_ID { 2 },
+        back_left_motor_ID { 4 };
 
         // Initalize
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};

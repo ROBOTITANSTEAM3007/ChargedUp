@@ -51,7 +51,8 @@ void Robot::RobotPeriodic() {}
  */
 void Robot::AutonomousInit() {
     m_autoSelected = m_chooser.GetSelected();
-        m_autoSelected = frc::SmartDashboard::GetString("Auto Selector", kAutoNameDefault);
+    m_autoSelected = frc::SmartDashboard::GetString("Auto Selector", kAutoNameDefault);
+
     fmt::print("Auto selected: {}\n", m_autoSelected);
 
     if (m_autoSelected == kAutoNameCustom) {
