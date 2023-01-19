@@ -2,15 +2,18 @@
 
 #include <frc/Joystick.h>
 
+enum {ALL, PRESS, RELEASE};
+
 struct Button
 {
     short 
     ID, 
     type;
 
-    bool active;
+    bool active,
+         disabled{ false };
 
-    frc::Joystick* joystick{nullptr};
+    frc::Joystick* joystick{ nullptr };
     
     Button(short t_ID, frc::Joystick* t_joystick, short t_type = 0)
     {
@@ -23,17 +26,33 @@ struct Button
     {
         switch (type)
         {
-        case 0:
+        case ALL:
             active = joystick->GetRawButton(ID);
             break;
-        case 1:
+        case PRESS:
             active = joystick->GetRawButtonPressed(ID);
             break;
-        case 2:
+        case RELEASE:
             active = joystick->GetRawButtonReleased(ID);
             break;
         default:
             break;
         }
+
+        if (disabled)
+        { active = false; }
     }
+
+    bool is_active()
+    {
+        update();
+
+        return active;
+    }
+
+    void disable()
+    { disabled = true; }
+
+    void enable()
+    { disabled = false; }
 };

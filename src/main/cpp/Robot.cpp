@@ -73,28 +73,28 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    frc::SmartDashboard::PutNumber("Wokring", 0);
     frc::SmartDashboard::PutNumber("press", 0);
 
-    button_1.update();
-    drive_joystick.update();
+    drive_train.DriveCartesian(drive_joystick.get_x(), drive_joystick.get_y(), drive_joystick.get_twist());
 
-    if (fabs(drive_joystick.x) >= drive_joystick.deadzone || fabs(drive_joystick.y) >= drive_joystick.deadzone || fabs(drive_joystick.twist) >= drive_joystick.deadzone) {
-        frc::SmartDashboard::PutNumber("Wokring", 1);
-
-        drive_joystick.update(drive_joystick.sensitivity);
-
-        //polar or cartesian, we'll use whichever we like more
-        //add fourth parameter for gyro eventually if we want translation independent of where the robot is facing
-        drive_train.DriveCartesian(drive_joystick.x, drive_joystick.y, drive_joystick.twist);
-    } 
-    else
-    { drive_train.DriveCartesian(0, 0, 0); } // Removes the Error: MecanumDrive... Output not updated often enough.
-    
-    if (button_1.active)
+    if (button_1.is_active())
     {
         frc::SmartDashboard::PutNumber("press", 1);
         std::cout << "Active!" << std::endl;
+    }
+
+    if (button_2.is_active())
+    {  
+        std::cout << "B2 Active!" << std::endl;
+
+        if (button_1.disabled)
+        {
+            button_1.enable();
+        }
+        else
+        {
+            button_1.disable();   
+        }
     }
 }
 
