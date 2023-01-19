@@ -38,13 +38,12 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short 
-        front_right_motor_ID { 1 },
-        back_right_motor_ID { 3 },
+        short front_right_motor_ID { 1 };
+        short back_right_motor_ID { 3 };
 
         // Left Side
-        front_left_motor_ID { 2 },
-        back_left_motor_ID { 4 };
+        short front_left_motor_ID { 2 };
+        short back_left_motor_ID { 4 };
 
         // Initalize
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
@@ -59,10 +58,12 @@ class Robot : public frc::TimedRobot {
         // Drive Stick
         Joystick drive_joystick{0, 0.1, 1};
 
-        // 0 = Always detecting input
-        // 1 = Only once on press down            |
-        // 2 = Only once on release               v
-        Button button_1{1, drive_joystick.object, 0};
+        // ALL = Always detecting input
+        // PRESS = Only once on press down            
+        // RELEASE = Only once on release               
+        Button button_1{1, drive_joystick.object, ALL};
+
+        Button button_2{2, drive_joystick.object, PRESS};
 
     private:
         frc::SendableChooser<std::string> m_chooser;
