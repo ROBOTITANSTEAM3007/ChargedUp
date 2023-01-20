@@ -42,12 +42,12 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short front_right_motor_ID { 1 };
-        short back_right_motor_ID { 3 };
+        short front_right_motor_ID { 3 };
+        short back_right_motor_ID { 2};
 
         // Left Side
-        short front_left_motor_ID { 2 };
-        short back_left_motor_ID { 4 };
+        short front_left_motor_ID { 4 };
+        short back_left_motor_ID { 1 };
 
         // Initalize
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
