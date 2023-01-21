@@ -5,8 +5,11 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 
+enum {APRIL, REFLECT};
+
 class Limelight
 {
+private:
     static std::shared_ptr<nt::NetworkTable> get_table()
     {
         nt::NetworkTableInstance network_instance = nt::NetworkTableInstance::GetDefault();
@@ -14,6 +17,7 @@ class Limelight
         return network_instance.GetTable("limelight");
     };
 
+public:
     static void put_data(const std::string name, double data)
     { get_table()->PutNumber(name, data); }
 

@@ -20,6 +20,7 @@
 #include <frc/drive/MecanumDrive.h>
 #include <frc/TimedRobot.h>
 
+#include "Limelight.h"
 #include "Joystick.h"
 #include "Button.h"
 #include "Arm.h"
