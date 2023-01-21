@@ -2,14 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// ARM LAYOUT
-// Hand Motor
-// Claw Pnumatic
-// Shoulder Motor
-
-// Shoulder Encoder
-// 
-
 #include "Robot.h"
 
 #include <iostream>
@@ -17,8 +9,6 @@
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-
-    frc::SmartDashboard::PutNumber("press", 0);
 
     frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 
@@ -73,15 +63,10 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    frc::SmartDashboard::PutNumber("press", 0);
-
     drive_train.DriveCartesian(drive_joystick.get_x(), drive_joystick.get_y(), drive_joystick.get_twist());
 
     if (button_1.is_active())
-    {
-        frc::SmartDashboard::PutNumber("press", 1);
-        std::cout << "Active!" << std::endl;
-    }
+    { std::cout << "Active!" << std::endl; }
 
     if (button_2.is_active())
     {  

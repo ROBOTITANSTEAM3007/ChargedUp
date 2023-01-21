@@ -1,5 +1,13 @@
 #pragma once
 
+// ARM LAYOUT
+// Hand Motor
+// Claw Pnumatic
+// Shoulder Motor
+
+// Shoulder Encoder
+// 
+
 #include <frc/Solenoid.h>
 #include <rev/CANSparkMax.h>
 
