@@ -63,22 +63,30 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    drive_train.DriveCartesian(drive_joystick.get_x(), drive_joystick.get_y(), drive_joystick.get_twist());
+    drive_train.DriveCartesian(drive_joystick.get_twist(), drive_joystick.get_x(), -drive_joystick.get_y());
 
     if (button_1.is_active())
-    { std::cout << "Active!" << std::endl; }
-
-    if (button_2.is_active())
-    {  
-        std::cout << "B2 Active!" << std::endl;
-
-        if (button_1.disabled)
+    { 
+        if (Limelight::get_data("pipeline", APRIL))
         {
-            button_1.enable();
+            Limelight::put_data("pipeline", REFLECT);
         }
         else
         {
-            button_1.disable();   
+            Limelight::put_data("pipeline", APRIL);   
+        }
+    }
+
+
+    if (button_2.is_active())
+    {  
+        if (Limelight::get_data("ledMode", 0))
+        {
+            Limelight::put_data("ledMode", 1);
+        }
+        else
+        {
+            Limelight::put_data("ledMode", 0);
         }
     }
 }
