@@ -16,6 +16,9 @@ void Robot::RobotInit() {
     back_right_motor.RestoreFactoryDefaults();
     front_left_motor.RestoreFactoryDefaults();
     back_left_motor.RestoreFactoryDefaults();
+
+    imu.Calibrate();
+    imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 }
 
 /**
@@ -63,32 +66,38 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    drive_train.DriveCartesian(drive_joystick.get_twist(), drive_joystick.get_x(), -drive_joystick.get_y());
+    drive_train.DriveCartesian(drive_joystick.get_twist(0.2, 0.25), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()/180 * M_PI);
 
     if (button_1.is_active())
     { 
-        if (Limelight::get_data("pipeline", APRIL))
+        std::cout << "Button 1" << std::endl;
+
+        if (Limelight::get_data("pipeline", 1) == 1)
         {
-            Limelight::put_data("pipeline", REFLECT);
+            Limelight::put_data("pipeline", 0);
         }
         else
         {
-            Limelight::put_data("pipeline", APRIL);   
+            Limelight::put_data("pipeline", 1);   
         }
     }
 
 
     if (button_2.is_active())
     {  
-        if (Limelight::get_data("ledMode", 0))
+        std::cout << "Button 2" << std::endl;
+
+        if (Limelight::get_data("ledMode", 1) == 1)
         {
-            Limelight::put_data("ledMode", 1);
+            Limelight::put_data("ledMode", 3);
         }
         else
         {
-            Limelight::put_data("ledMode", 0);
+            Limelight::put_data("ledMode", 1);
         }
     }
+
+    std::cout << (double)imu.GetAngle() << std::endl;
 }
 
 void Robot::DisabledInit() {}

@@ -5,9 +5,9 @@
 struct Joystick
 {
 private:
-    double deadzone, sensitivity, y, x, twist;
+    double y, x, twist;
 
-    double evaluate(double value)
+    double evaluate(double value, double deadzone, double sensitivity)
     {
         if (fabs(value) >= deadzone)
         {
@@ -25,33 +25,31 @@ public:
 
     frc::Joystick *object{nullptr};
 
-    Joystick(short t_ID, double t_deadzone, double t_sensitivity)
+    Joystick(short t_ID)
     {
         ID = t_ID;
-        deadzone = t_deadzone;
-        sensitivity = t_sensitivity;
 
         object = new frc::Joystick(t_ID);
     }
 
-    double get_y()
+    double get_y(double deadzone, double sensitivity)
     {
         y = object->GetY();
 
-        return evaluate(y);
+        return evaluate(y, deadzone, sensitivity);
     }
 
-    double get_x()
+    double get_x(double deadzone, double sensitivity)
     {
         x = object->GetX();
 
-        return evaluate(x);
+        return evaluate(x, deadzone, sensitivity);
     }
 
-    double get_twist()
+    double get_twist(double deadzone, double sensitivity)
     {
         twist = object->GetTwist();
 
-        return evaluate(twist);
+        return evaluate(twist, deadzone, sensitivity);
     }
 };
