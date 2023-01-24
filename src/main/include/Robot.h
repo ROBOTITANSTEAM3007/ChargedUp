@@ -11,6 +11,10 @@
 
 #include <rev/CANSparkMax.h>
 
+#include <frc/PneumaticsControlModule.h>
+#include <frc/Compressor.h>
+#include <frc/Solenoid.h>
+
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/drive/MecanumDrive.h>
