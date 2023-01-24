@@ -20,6 +20,8 @@
 #include <frc/drive/MecanumDrive.h>
 #include <frc/TimedRobot.h>
 
+#include <frc/ADIS16470_IMU.h>
+
 #include "Limelight.h"
 #include "Joystick.h"
 #include "Button.h"
@@ -43,12 +45,12 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short front_right_motor_ID { 1 };
+        short front_right_motor_ID { 2 };
         short back_right_motor_ID { 3 };
 
         // Left Side
-        short front_left_motor_ID { 2 };
-        short back_left_motor_ID { 4 };
+        short front_left_motor_ID { 4 };
+        short back_left_motor_ID { 1 };
 
         // Initalize
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
@@ -56,12 +58,15 @@ class Robot : public frc::TimedRobot {
         rev::CANSparkMax front_left_motor{front_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
         rev::CANSparkMax back_left_motor{back_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
+        // IMU
+        frc::ADIS16470_IMU imu{};
+
         // DRIVE
         frc::MecanumDrive drive_train{front_left_motor, back_left_motor, front_right_motor, back_right_motor};
 
         // STICKS
         // Drive Stick
-        Joystick drive_joystick{0, 0.1, 1};
+        Joystick drive_joystick{0};
 
         // ALL = Always detecting input
         // PRESS = Only once on press down            

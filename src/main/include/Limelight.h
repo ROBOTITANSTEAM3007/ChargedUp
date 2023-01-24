@@ -5,8 +5,6 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 
-enum {APRIL, REFLECT};
-
 class Limelight
 {
 private:
