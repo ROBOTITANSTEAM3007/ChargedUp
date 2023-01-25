@@ -66,7 +66,7 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    drive_train.DriveCartesian(drive_joystick.get_twist(0.2, 0.25), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()/180 * M_PI);
+    drive_train.DriveCartesian(drive_joystick.get_twist(0.2, 0.25), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()*(M_PI/180));
 
     if (button_1.is_active())
     { 
