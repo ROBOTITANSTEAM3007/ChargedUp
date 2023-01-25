@@ -45,12 +45,12 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short front_right_motor_ID { 2 };
-        short back_right_motor_ID { 3 };
+        short front_right_motor_ID { 3 }; //2
+        short back_right_motor_ID { 2 }; //3
 
         // Left Side
-        short front_left_motor_ID { 4 };
-        short back_left_motor_ID { 1 };
+        short front_left_motor_ID { 4 }; //4
+        short back_left_motor_ID { 1 }; //1
 
         // Initalize
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
@@ -62,7 +62,7 @@ class Robot : public frc::TimedRobot {
         frc::ADIS16470_IMU imu{};
 
         // DRIVE
-        frc::MecanumDrive drive_train{front_left_motor, back_left_motor, front_right_motor, back_right_motor};
+        frc::MecanumDrive drive_train{front_left_motor, back_right_motor, front_right_motor};
 
         // STICKS
         // Drive Stick
