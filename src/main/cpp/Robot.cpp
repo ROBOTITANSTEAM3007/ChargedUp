@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 void Robot::RobotInit() {
     m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
     m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
@@ -66,10 +68,13 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    drive_train.DriveCartesian(drive_joystick.get_twist(0.2, 0.25), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()*(M_PI/180));
+    // auto strafe_temp = drive_joystick.get_y(0.15, 0.5) * sin((double)imu.GetAngle()*(M_PI/180)) + drive_joystick.get_x(0.15, 0.5) * cos((double)imu.GetAngle()*(M_PI/180));
+    // auto fwd = -drive_joystick.get_y(0.15, 0.5) * cos((double)imu.GetAngle()*(M_PI/180)) + strafe_temp * sin((double)imu.GetAngle()*(M_PI/180));
+    drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()*(M_PI/180));
+    // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), strafe_temp, fwd);
 
     if (button_1.is_active())
-    { 
+    {  
         std::cout << "Button 1" << std::endl;
 
         if (Limelight::get_data("pipeline", 1) == 1)
@@ -95,6 +100,13 @@ void Robot::TeleopPeriodic() {
         {
             Limelight::put_data("ledMode", 1);
         }
+    }
+
+    if (button_6.is_active()) {
+        
+        cout << "Button 6 Gyro Reset" << endl;
+
+        imu.Reset();
     }
 
     std::cout << (double)imu.GetAngle() << std::endl;

@@ -75,6 +75,8 @@ class Robot : public frc::TimedRobot {
 
         Button button_2{2, drive_joystick.object, PRESS};
 
+        Button button_6{6, drive_joystick.object, PRESS};
+
     private:
         frc::SendableChooser<std::string> m_chooser;
         const std::string kAutoNameDefault = "Default";
