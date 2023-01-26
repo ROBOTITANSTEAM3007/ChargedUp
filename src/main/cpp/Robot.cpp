@@ -70,9 +70,8 @@ void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
     // auto strafe_temp = drive_joystick.get_y(0.15, 0.5) * sin((double)imu.GetAngle()*(M_PI/180)) + drive_joystick.get_x(0.15, 0.5) * cos((double)imu.GetAngle()*(M_PI/180));
     // auto fwd = -drive_joystick.get_y(0.15, 0.5) * cos((double)imu.GetAngle()*(M_PI/180)) + strafe_temp * sin((double)imu.GetAngle()*(M_PI/180));
-    // // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()*(M_PI/180));
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), strafe_temp, fwd);
-    drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5));
+    drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
 
     if (button_1.is_active())
     {  
