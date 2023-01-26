@@ -25,6 +25,7 @@ public:
 
     frc::Joystick *object{nullptr};
 
+    
     Joystick(short t_ID)
     {
         ID = t_ID;

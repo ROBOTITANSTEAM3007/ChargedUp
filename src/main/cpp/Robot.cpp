@@ -7,18 +7,21 @@
 #include <iostream>
 
 void Robot::RobotInit() {
-    m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-    m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+    auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
+    auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
 
-    frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+    frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
     front_right_motor.RestoreFactoryDefaults();
     back_right_motor.RestoreFactoryDefaults();
     front_left_motor.RestoreFactoryDefaults();
     back_left_motor.RestoreFactoryDefaults();
 
-    imu.Calibrate();
-    imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
+    front_right_motor.SetInverted(true);
+    back_right_motor.SetInverted(true);
+
+    Gyro::imu.Calibrate();
+    Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 }
 
 /**
@@ -43,30 +46,38 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
-    m_autoSelected = m_chooser.GetSelected();
-    m_autoSelected = frc::SmartDashboard::GetString("Auto Selector", kAutoNameDefault);
+    selected_auto = auto_chooser.GetSelected();
+    selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
 
-    fmt::print("Auto selected: {}\n", m_autoSelected);
+    // fmt::print("Auto selected: {}\n", selected_auto);
 
-    if (m_autoSelected == kAutoNameCustom) {
-        // Custom Auto goes here
+    if (selected_auto == auto_profile_testing) {
+        
     } else {
         // Default Auto goes here
   }
 }
 
 void Robot::AutonomousPeriodic() {
-    if (m_autoSelected == kAutoNameCustom) {
+    std::cout << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
+    std::cout << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
+
+    frc::SmartDashboard::PutNumber("AX", (double)Gyro::imu.GetAccelX());
+    frc::SmartDashboard::PutNumber("AY", (double)Gyro::imu.GetAccelY());
+    frc::SmartDashboard::PutNumber("AZ", (double)Gyro::imu.GetAccelZ());
+
+    if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
     } else {
         // Default Auto goes here
-  }
+    }
 }
 
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    drive_train.DriveCartesian(drive_joystick.get_twist(0.2, 0.25), drive_joystick.get_x(0.15, 0.5), -drive_joystick.get_y(0.15, 0.5), imu.GetAngle()/180 * M_PI);
+    // Default: Twist, X, Y
+    drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 0.5), drive_joystick.get_x(0.15, 0.5), drive_joystick.get_twist(0.2, 0.25));
 
     if (button_1.is_active())
     { 
@@ -97,7 +108,7 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    std::cout << (double)imu.GetAngle() << std::endl;
+    // std::cout << (double)imu.GetAngle() << std::endl;
 }
 
 void Robot::DisabledInit() {}
