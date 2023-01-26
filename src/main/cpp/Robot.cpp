@@ -117,7 +117,7 @@ void Robot::TeleopPeriodic() {
         
         cout << "Button 6 Gyro Reset" << endl;
 
-        imu.Reset();
+        Gyro::imu.Reset();
     }
     // std::cout << (double)imu.GetAngle() << std::endl;
 }
