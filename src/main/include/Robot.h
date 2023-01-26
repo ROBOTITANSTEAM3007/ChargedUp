@@ -58,12 +58,13 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short front_right_motor_ID { 3 }; // Default: 2
-        short back_right_motor_ID { 2 }; // Default: 3
+
+        short front_right_motor_ID { 2 }; //2 //or 3?
+        short back_right_motor_ID { 4 }; //3 //or 2?
 
         // Left Side
-        short front_left_motor_ID { 4 }; // Default: 4
-        short back_left_motor_ID { 1 }; // Default: 1
+        short front_left_motor_ID { 1 }; //4
+        short back_left_motor_ID { 3 }; //1
 
         // Initalize Motors
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
@@ -75,7 +76,7 @@ class Robot : public frc::TimedRobot {
         rev::SparkMaxAnalogSensor front_right_motor_encoder {front_right_motor.GetAnalog()};
 
         // DRIVE
-        frc::MecanumDrive drive_train{front_left_motor, back_left_motor, front_right_motor, back_right_motor};
+        frc::MecanumDrive drive_train {front_left_motor, back_left_motor, back_right_motor, front_right_motor};
 
         // STICKS
         // Drive Stick
@@ -88,6 +89,7 @@ class Robot : public frc::TimedRobot {
 
         Button button_2{2, drive_joystick.object, PRESS};
 
+        Button button_6{6, drive_joystick.object, PRESS};
         // Button vision_button{3, drive_joystick, PRESS};
 
         // Button 
