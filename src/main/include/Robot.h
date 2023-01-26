@@ -6,6 +6,7 @@
 #pragma once
 
 #include <string>
+#include <chrono>
 
 #include <fmt/core.h>
 
@@ -20,12 +21,24 @@
 #include <frc/drive/MecanumDrive.h>
 #include <frc/TimedRobot.h>
 
-#include <frc/ADIS16470_IMU.h>
+#include <iostream>
 
+#include "Gyro.h"
 #include "Limelight.h"
 #include "Joystick.h"
 #include "Button.h"
 #include "Arm.h"
+
+struct PID
+{
+    double
+    proportion,
+    integral,
+    derivative;
+
+    PID(double t_p, double t_i, double t_d);
+};
+
 
 class Robot : public frc::TimedRobot {
     public:
@@ -45,21 +58,22 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short front_right_motor_ID { 2 }; //2 //or 3? //2
-        short back_right_motor_ID { 4 }; //3 //or 2? //4
+
+        short front_right_motor_ID { 2 }; //2 //or 3?
+        short back_right_motor_ID { 4 }; //3 //or 2?
 
         // Left Side
-        short front_left_motor_ID { 1 }; //4 //1
-        short back_left_motor_ID { 3 }; //1 //3
+        short front_left_motor_ID { 1 }; //4
+        short back_left_motor_ID { 3 }; //1
 
-        // Initalize
+        // Initalize Motors
         rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
         rev::CANSparkMax back_right_motor{back_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
         rev::CANSparkMax front_left_motor{front_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
         rev::CANSparkMax back_left_motor{back_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
-        // IMU
-        frc::ADIS16470_IMU imu{};
+        // Initalize Encoders
+        rev::SparkMaxAnalogSensor front_right_motor_encoder {front_right_motor.GetAnalog()};
 
         // DRIVE
         frc::MecanumDrive drive_train {front_left_motor, back_left_motor, back_right_motor, front_right_motor};
@@ -76,10 +90,13 @@ class Robot : public frc::TimedRobot {
         Button button_2{2, drive_joystick.object, PRESS};
 
         Button button_6{6, drive_joystick.object, PRESS};
+        // Button vision_button{3, drive_joystick, PRESS};
+
+        // Button 
 
     private:
-        frc::SendableChooser<std::string> m_chooser;
-        const std::string kAutoNameDefault = "Default";
-        const std::string kAutoNameCustom = "My Auto";
-        std::string m_autoSelected;
+        frc::SendableChooser<std::string> auto_chooser;
+        const std::string auto_profile_default = "Default";
+        const std::string auto_profile_testing = "Testing";
+        std::string selected_auto;
 };
