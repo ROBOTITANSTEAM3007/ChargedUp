@@ -81,7 +81,9 @@ struct Vector3D
 class Gyro
 {
 private:
-    static std::chrono::high_resolution_clock::time_point current_tick, previous_tick;
+    static inline bool first_loop {true};
+
+    static inline std::chrono::high_resolution_clock::time_point current_tick, previous_tick;
 public:
     // IMU
     static inline frc::ADIS16470_IMU imu{};
@@ -99,12 +101,23 @@ void Gyro::update()
 {
     current_tick = std::chrono::high_resolution_clock::now();
 
-    // 1 Second = 1000000 Microseconds
-    double delta_time = std::chrono::duration_cast<std::chrono::microseconds>(current_tick - previous_tick).count();
+    if (!first_loop)
+    {
+        // 1 Second = 1,000,000 Microseconds
+        double delta_time = std::chrono::duration_cast<std::chrono::microseconds>(current_tick - previous_tick).count();
 
-    acceleration.set(Vector3D{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()}.sub(0, 0, 9.807).deadzone(0.05));
-    velocity.add(acceleration.mult(delta_time/1000000));
-    position.add(velocity);
+        Vector3D a{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()};
+
+        // std::cout << delta_time << std::endl;
+
+        acceleration = a.sub(0, 0, 0.9807).deadzone(0.05);
+        Vector3D v{acceleration.mult(delta_time/1000000)};
+        velocity = velocity.add(v);
+        // Vector3D p{velocity.mult(delta_time/1000000)};
+        position = position.add(velocity);
+    }
+
+    first_loop = false;
 
     previous_tick = std::chrono::high_resolution_clock::now();
 }

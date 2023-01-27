@@ -20,7 +20,7 @@ void Robot::RobotInit() {
     front_right_motor.SetInverted(true);
     back_right_motor.SetInverted(true);
 
-    Gyro::imu.Calibrate();
+    // Gyro::imu.Calibrate();
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 }
 
@@ -59,8 +59,10 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-    std::cout << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
-    std::cout << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
+    Gyro::update();
+
+    std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
+    std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
 
     frc::SmartDashboard::PutNumber("AX", (double)Gyro::imu.GetAccelX());
     frc::SmartDashboard::PutNumber("AY", (double)Gyro::imu.GetAccelY());
