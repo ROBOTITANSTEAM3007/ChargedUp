@@ -22,6 +22,8 @@ void Robot::RobotInit() {
     front_right_motor.SetInverted(true);
     back_right_motor.SetInverted(true);
 
+
+    Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_8s); // Default: 4s
     Gyro::imu.Calibrate();
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 }
@@ -61,13 +63,6 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-    Gyro::update();
-    std::cout << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
-    std::cout << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
-    
-    frc::SmartDashboard::PutNumber("AX", (double)Gyro::imu.GetAccelX());
-    frc::SmartDashboard::PutNumber("AY", (double)Gyro::imu.GetAccelY());
-    frc::SmartDashboard::PutNumber("AZ", (double)Gyro::imu.GetAccelZ());
 
     if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
@@ -79,23 +74,35 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
+    Gyro::update();
+
+    std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
+    std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
+
+    frc::SmartDashboard::PutNumber("AX", Gyro::acceleration.x);
+    frc::SmartDashboard::PutNumber("AY", Gyro::acceleration.y);
+    frc::SmartDashboard::PutNumber("AZ", Gyro::acceleration.z);
+
+    frc::SmartDashboard::PutNumber("VX", Gyro::velocity.x);
+    frc::SmartDashboard::PutNumber("VY", Gyro::velocity.y);
+    frc::SmartDashboard::PutNumber("VZ", Gyro::velocity.z);
+
+    frc::SmartDashboard::PutNumber("PX", Gyro::position.x);
+    frc::SmartDashboard::PutNumber("PY", Gyro::position.y);
+    frc::SmartDashboard::PutNumber("PZ", Gyro::position.z);
+
     // Default: Twist, X, Y
-    drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
+    // drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     // this commented drive is here to help me with merging
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
     
     if (button_1.is_active())
     {  
-        std::cout << "Button 1" << std::endl;
-
-        if (Limelight::get_data("pipeline", 1) == 1)
-        {
-            Limelight::put_data("pipeline", 0);
-        }
-        else
-        {
-            Limelight::put_data("pipeline", 1);   
-        }
+        Limelight::retroreflective_auto(drive_train);
+    }
+    else
+    {
+        drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     }
 
 
@@ -117,7 +124,14 @@ void Robot::TeleopPeriodic() {
         
         cout << "Button 6 Gyro Reset" << endl;
 
-        imu.Reset();
+        Gyro::imu.Reset();
+    }
+
+    if (button_3.is_active())
+    {
+        cout << "Button 3 Velocity Reset" << endl;
+
+        Gyro::velocity.set(Vector3D::zero());
     }
     // std::cout << (double)imu.GetAngle() << std::endl;
 }
