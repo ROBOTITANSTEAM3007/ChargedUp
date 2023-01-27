@@ -75,7 +75,7 @@ class Robot : public frc::TimedRobot {
         rev::SparkMaxAnalogSensor front_right_motor_encoder {front_right_motor.GetAnalog()};
 
         // DRIVE
-        frc::MecanumDrive drive_train{front_left_motor, back_left_motor, front_right_motor, back_right_motor};
+        frc::MecanumDrive drive_train {front_left_motor, back_left_motor, back_right_motor, front_right_motor};
 
         // STICKS
         // Drive Stick
@@ -88,6 +88,7 @@ class Robot : public frc::TimedRobot {
 
         Button button_2{2, drive_joystick.object, PRESS};
 
+        Button button_6{6, drive_joystick.object, PRESS};
         // Button vision_button{3, drive_joystick, PRESS};
 
         // Button 

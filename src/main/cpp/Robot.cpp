@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 void Robot::RobotInit() {
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
@@ -79,10 +81,12 @@ void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
     // Default: Twist, X, Y
-    drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 0.5), drive_joystick.get_x(0.15, 0.5), drive_joystick.get_twist(0.2, 0.25));
-
+    drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
+    // this commented drive is here to help me with merging
+    // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
+    
     if (button_1.is_active())
-    { 
+    {  
         std::cout << "Button 1" << std::endl;
 
         if (Limelight::get_data("pipeline", 1) == 1)
@@ -110,6 +114,12 @@ void Robot::TeleopPeriodic() {
         }
     }
 
+    if (button_6.is_active()) {
+        
+        cout << "Button 6 Gyro Reset" << endl;
+
+        imu.Reset();
+    }
     // std::cout << (double)imu.GetAngle() << std::endl;
 }
 
