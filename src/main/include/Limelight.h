@@ -1,3 +1,4 @@
+#pragma once
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
@@ -6,6 +7,8 @@
 
 #include <frc/drive/MecanumDrive.h>
 #include <iostream>
+
+#include "Robot.h"
 
 class Limelight
 {

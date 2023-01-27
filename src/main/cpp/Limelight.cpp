@@ -3,7 +3,9 @@
 
 void Limelight::retroreflective_auto(frc::MecanumDrive &drive_train)
 {
-    put_data("pipeline", 0);
+    // put_data("pipeline", 0);
+
+    PID rotation_pid{0.25, 0, 0};
 
     double 
     visible_target { get_data("tv", 0) },
@@ -16,7 +18,7 @@ void Limelight::retroreflective_auto(frc::MecanumDrive &drive_train)
 
         double percentage_offset = horizontal_offset / 27;
 
-        drive_train.DriveCartesian(0.5 * percentage_offset, 0, 0);
+        drive_train.DriveCartesian(0, 0, percentage_offset * rotation_pid.proportion);
     }
     else
     {

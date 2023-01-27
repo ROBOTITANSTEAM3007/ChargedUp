@@ -4,6 +4,8 @@
 
 #include <frc/ADIS16470_IMU.h>
 
+#define METER_PER_SEC_PER_G 9.80665
+#define MICROSECOND_PER_SECOND 1000000
 
 struct Vector3D
 {
@@ -23,7 +25,7 @@ struct Vector3D
         z = t_vector.z;
     };
 
-    void set(Vector3D t_vector)
+    void set(const Vector3D &t_vector)
     {
         x = t_vector.x;
         y = t_vector.y;
@@ -42,10 +44,10 @@ struct Vector3D
 
 
     // Addition & Subtraction
-    Vector3D add(Vector3D t_vector)
+    Vector3D add(const Vector3D &t_vector)
     { return Vector3D{x + t_vector.x, y + t_vector.y, z + t_vector.z}; }
 
-    Vector3D sub(Vector3D t_vector)
+    Vector3D sub(const Vector3D &t_vector)
     { return Vector3D{x - t_vector.x, y - t_vector.y, z - t_vector.z}; }
 
     Vector3D add(double t_x, double t_y, double t_z)
@@ -65,9 +67,9 @@ struct Vector3D
     {
         return Vector3D
         {
-            (x < value ? 0 : x),
-            (y < value ? 0 : y),
-            (z < value ? 0 : z)
+            (fabs(x) < value ? 0 : x),
+            (fabs(x) < value ? 0 : y),
+            (fabs(x) < value ? 0 : z)
         };
     }
 
@@ -81,12 +83,13 @@ struct Vector3D
 class Gyro
 {
 private:
-    static inline bool first_loop {true};
+    static inline bool initiallized {false};
 
     static inline std::chrono::high_resolution_clock::time_point current_tick, previous_tick;
 public:
     // IMU
     static inline frc::ADIS16470_IMU imu{};
+    // NOTE: I think the IMU measures acceleration in 'g' (g-force)
 
     // Robot Kinematics
     static inline Vector3D 
@@ -94,30 +97,25 @@ public:
     velocity {Vector3D::zero()},
     position {Vector3D::zero()};
 
-    static void update();
-};
-
-void Gyro::update()
-{
-    current_tick = std::chrono::high_resolution_clock::now();
-
-    if (!first_loop)
+    static void update()
     {
-        // 1 Second = 1,000,000 Microseconds
-        double delta_time = std::chrono::duration_cast<std::chrono::microseconds>(current_tick - previous_tick).count();
+        current_tick = std::chrono::high_resolution_clock::now();
 
-        Vector3D a{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()};
+        if (initiallized)
+        {
+            // 1 Second = 1,000,000 Microseconds
+            double delta_time = std::chrono::duration_cast<std::chrono::microseconds>(current_tick - previous_tick).count();
 
-        // std::cout << delta_time << std::endl;
+            // std::cout << delta_time << std::endl;
 
-        acceleration = a.sub(0, 0, 0.9807).deadzone(0.05);
-        Vector3D v{acceleration.mult(delta_time/1000000)};
-        velocity = velocity.add(v);
-        // Vector3D p{velocity.mult(delta_time/1000000)};
-        position = position.add(velocity);
+            acceleration.set(Vector3D{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()}.sub(0, 0, 1).deadzone(0.06).mult(METER_PER_SEC_PER_G));
+            velocity.set(velocity.add(acceleration.mult(delta_time/MICROSECOND_PER_SECOND)));
+            // Vector3D p{velocity.mult(delta_time/MICROSECOND_PER_SECOND)};
+            position.set(position.add(velocity));
+        }
+
+        initiallized = true;
+
+        previous_tick = std::chrono::high_resolution_clock::now();
     }
-
-    first_loop = false;
-
-    previous_tick = std::chrono::high_resolution_clock::now();
-}
+};

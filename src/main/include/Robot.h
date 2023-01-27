@@ -31,12 +31,19 @@
 
 struct PID
 {
+    
     double
     proportion,
     integral,
     derivative;
 
-    PID(double t_p, double t_i, double t_d);
+
+    PID(double t_p, double t_i, double t_d)
+    {
+        proportion = t_p;
+        integral = t_i;
+        derivative = t_d;
+    }
 };
 
 
@@ -75,7 +82,7 @@ class Robot : public frc::TimedRobot {
         rev::SparkMaxAnalogSensor front_right_motor_encoder {front_right_motor.GetAnalog()};
 
         // DRIVE
-        frc::MecanumDrive drive_train {front_left_motor, back_left_motor, back_right_motor, front_right_motor};
+        frc::MecanumDrive drive_train {front_left_motor, back_left_motor, front_right_motor, back_right_motor};
 
         // STICKS
         // Drive Stick
@@ -84,12 +91,12 @@ class Robot : public frc::TimedRobot {
         // ALL = Always detecting input
         // PRESS = Only once on press down            
         // RELEASE = Only once on release               
-        Button button_1{1, drive_joystick.object, PRESS};
+        Button button_1{1, drive_joystick.object, ALL};
 
         Button button_2{2, drive_joystick.object, PRESS};
 
         Button button_6{6, drive_joystick.object, PRESS};
-        // Button vision_button{3, drive_joystick, PRESS};
+        Button button_3{3, drive_joystick.object, PRESS};
 
         // Button 
 
