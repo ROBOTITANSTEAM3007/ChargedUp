@@ -21,23 +21,16 @@
 #include <frc/drive/MecanumDrive.h>
 #include <frc/TimedRobot.h>
 
+#include <frc/ADXL345_I2C.h>
+
 #include <iostream>
 
 #include "Gyro.h"
 #include "Limelight.h"
 #include "Joystick.h"
 #include "Button.h"
+#include "Drive.h"
 #include "Arm.h"
-
-struct PID
-{
-    double
-    proportion,
-    integral,
-    derivative;
-
-    PID(double t_p, double t_i, double t_d);
-};
 
 
 class Robot : public frc::TimedRobot {
@@ -58,25 +51,20 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-
-        short front_right_motor_ID { 2 }; //2 //or 3?
-        short back_right_motor_ID { 4 }; //3 //or 2?
+        short 
+        front_right_motor_ID { 2 }, //2
+        back_right_motor_ID { 4 }, //4
 
         // Left Side
-        short front_left_motor_ID { 1 }; //4
-        short back_left_motor_ID { 3 }; //1
-
-        // Initalize Motors
-        rev::CANSparkMax front_right_motor{front_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
-        rev::CANSparkMax back_right_motor{back_right_motor_ID , rev::CANSparkMax::MotorType::kBrushless};
-        rev::CANSparkMax front_left_motor{front_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
-        rev::CANSparkMax back_left_motor{back_left_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
-
-        // Initalize Encoders
-        rev::SparkMaxAnalogSensor front_right_motor_encoder {front_right_motor.GetAnalog()};
+        front_left_motor_ID { 1 }, //1
+        back_left_motor_ID { 3 }; //3
 
         // DRIVE
-        frc::MecanumDrive drive_train {front_left_motor, back_left_motor, back_right_motor, front_right_motor};
+        Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
+
+        rev::SparkMaxAlternateEncoder encoder{drive_train.front_left_motor->GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
+
+        // rev::SparkMaxAlternateEncoder encoder = drive_train.front_left_motor->GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192);
 
         // STICKS
         // Drive Stick
@@ -85,12 +73,12 @@ class Robot : public frc::TimedRobot {
         // ALL = Always detecting input
         // PRESS = Only once on press down            
         // RELEASE = Only once on release               
-        Button button_1{1, drive_joystick.object, PRESS};
+        Button button_1{1, drive_joystick.object, ALL};
 
         Button button_2{2, drive_joystick.object, PRESS};
 
         Button button_6{6, drive_joystick.object, PRESS};
-        // Button vision_button{3, drive_joystick, PRESS};
+        Button button_3{3, drive_joystick.object, PRESS};
 
         // Button 
 
