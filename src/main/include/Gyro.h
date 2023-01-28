@@ -63,13 +63,50 @@ struct Vector3D
     Vector3D mult(double value)
     { return Vector3D{x * value, y * value, z * value}; }
 
-    Vector3D deadzone(double value)
+    Vector3D div(const Vector3D &t_vector)
+    { return Vector3D{x / t_vector.x, y / t_vector.y, z / t_vector.z}; }
+
+    Vector3D mult(const Vector3D &t_vector)
+    { return Vector3D{x * t_vector.x, y * t_vector.y, z * t_vector.z}; }
+
+    // Other
+    Vector3D minimum(double value)
     {
         return Vector3D
         {
-            (fabs(x) < value ? 0 : x),
-            (fabs(x) < value ? 0 : y),
-            (fabs(x) < value ? 0 : z)
+            (fabs(x) < value ? x : value),
+            (fabs(y) < value ? y : value),
+            (fabs(z) < value ? z : value)
+        };
+    }
+
+    Vector3D minimum(const Vector3D &t_vector)
+    {
+        return Vector3D
+        {
+            (fabs(x) < t_vector.x ? x : t_vector.x),
+            (fabs(y) < t_vector.y ? y : t_vector.y),
+            (fabs(z) < t_vector.z ? z : t_vector.z)
+        };
+    }
+
+    Vector3D maximum(double value)
+    {
+        return Vector3D
+        {
+            (fabs(x) > value ? x : value),
+            (fabs(y) > value ? y : value),
+            (fabs(z) > value ? z : value)
+        };
+    }
+
+    Vector3D maximum(const Vector3D &t_vector)
+    {
+        return Vector3D
+        {
+            (fabs(x) > t_vector.x ? x : t_vector.x),
+            (fabs(y) > t_vector.y ? y : t_vector.y),
+            (fabs(z) > t_vector.z ? z : t_vector.z)
         };
     }
 
@@ -86,6 +123,8 @@ private:
     static inline bool initiallized {false};
 
     static inline std::chrono::high_resolution_clock::time_point current_tick, previous_tick;
+
+    static inline double deadzone_value {0.02};
 public:
     // IMU
     static inline frc::ADIS16470_IMU imu{};
@@ -95,8 +134,10 @@ public:
     static inline Vector3D 
     acceleration {Vector3D::zero()},
     velocity {Vector3D::zero()},
-    position {Vector3D::zero()};
+    position {Vector3D::zero()},
+    normalize {-0.03, 0.05, -1};
 
+    // Update the acceleration, velocity, & position
     static void update()
     {
         current_tick = std::chrono::high_resolution_clock::now();
@@ -108,7 +149,7 @@ public:
 
             // std::cout << delta_time << std::endl;
 
-            acceleration.set(Vector3D{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()}.sub(0, 0, 1).deadzone(0.06).mult(METER_PER_SEC_PER_G));
+            acceleration.set(Vector3D{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()}.add(normalize).deadzone(deadzone_value).mult(METER_PER_SEC_PER_G));
             velocity.set(velocity.add(acceleration.mult(delta_time/MICROSECOND_PER_SECOND)));
             // Vector3D p{velocity.mult(delta_time/MICROSECOND_PER_SECOND)};
             position.set(position.add(velocity));
