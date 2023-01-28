@@ -149,7 +149,7 @@ public:
 
             // std::cout << delta_time << std::endl;
 
-            acceleration.set(Vector3D{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()}.add(normalize).deadzone(deadzone_value).mult(METER_PER_SEC_PER_G));
+            acceleration.set(Vector3D{(double)imu.GetAccelX(), (double)imu.GetAccelY(), (double)imu.GetAccelZ()}.add(normalize).minimum(deadzone_value).mult(METER_PER_SEC_PER_G));
             velocity.set(velocity.add(acceleration.mult(delta_time/MICROSECOND_PER_SECOND)));
             // Vector3D p{velocity.mult(delta_time/MICROSECOND_PER_SECOND)};
             position.set(position.add(velocity));
