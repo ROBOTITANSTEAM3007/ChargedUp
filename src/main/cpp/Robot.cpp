@@ -14,17 +14,16 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
-    front_right_motor.RestoreFactoryDefaults();
-    back_right_motor.RestoreFactoryDefaults();
-    front_left_motor.RestoreFactoryDefaults();
-    back_left_motor.RestoreFactoryDefaults();
+    drive_train.front_right_motor->RestoreFactoryDefaults();
+    drive_train.back_right_motor->RestoreFactoryDefaults();
+    drive_train.front_left_motor->RestoreFactoryDefaults();
+    drive_train.back_left_motor->RestoreFactoryDefaults();
 
-    front_right_motor.SetInverted(true);
-    back_right_motor.SetInverted(true);
-
+    drive_train.front_right_motor->SetInverted(true);
+    drive_train.back_right_motor->SetInverted(true);
 
     Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_8s); // Default: 4s
-    Gyro::imu.Calibrate();
+    // Gyro::imu.Calibrate();
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 }
 
@@ -96,13 +95,14 @@ void Robot::TeleopPeriodic() {
     // this commented drive is here to help me with merging
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
     
+    drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
+    drive_train.orientation = Gyro::imu.GetAngle();
+
+    std::cout << "Encoder: " << encoder.GetPosition() << std::endl;
+
     if (button_1.is_active())
     {  
         Limelight::retroreflective_auto(drive_train);
-    }
-    else
-    {
-        drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     }
 
 
@@ -134,6 +134,8 @@ void Robot::TeleopPeriodic() {
         Gyro::velocity.set(Vector3D::zero());
     }
     // std::cout << (double)imu.GetAngle() << std::endl;
+
+    drive_train.update();
 }
 
 void Robot::DisabledInit() {}
