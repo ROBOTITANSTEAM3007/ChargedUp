@@ -3,7 +3,7 @@
 #include <frc/drive/MecanumDrive.h>
 #include <rev/CANSparkMax.h>
 
-#include "Gyro.h"
+#include "Vector3D.h"
 
 struct PID
 {
@@ -23,8 +23,6 @@ struct PID
 
 class Drive
 {
-private:
-
 public:
 
     // MOTORS
