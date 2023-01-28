@@ -60,23 +60,27 @@ class Robot : public frc::TimedRobot {
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
-        rev::SparkMaxAlternateEncoder encoder{drive_train.front_left_motor->GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
+        //rev::SparkMaxAlternateEncoder encoder{drive_train.front_left_motor->GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
 
         // STICKS
         // Drive Stick
         Joystick drive_joystick{0};
+        Joystick arm_joystick{1};
+
+        // Button 
 
         // ALL = Always detecting input
         // PRESS = Only once on press down            
-        // RELEASE = Only once on release               
+        // RELEASE = Only once on release   
+
         Button button_1{1, drive_joystick.object, ALL};
-
         Button button_2{2, drive_joystick.object, PRESS};
-
         Button button_6{6, drive_joystick.object, PRESS};
         Button button_3{3, drive_joystick.object, PRESS};
 
-        // Button 
+        Button hand_button{1, arm_joystick.object, ALL};
+        Button lower_arm_button{4, arm_joystick.object, PRESS};
+
 
     private:
         frc::SendableChooser<std::string> auto_chooser;

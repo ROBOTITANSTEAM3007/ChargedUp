@@ -99,7 +99,7 @@ void Robot::TeleopPeriodic() {
     drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     drive_train.orientation = Gyro::imu.GetAngle();
 
-    std::cout << "Encoder: " << encoder.GetPosition() << std::endl;
+    std::cout << "Encoder: " << Arm::get_encoder() << std::endl;
 
     if (button_1.is_active())
     {  
@@ -126,6 +126,19 @@ void Robot::TeleopPeriodic() {
         cout << "Button 6 Gyro Reset" << endl;
 
         Gyro::imu.Reset();
+    }
+
+    if (lower_arm_button.is_active()) {
+        cout << "lower arm moving" << endl;
+
+        Arm::update_lower_arm(arm_joystick);
+    }
+    else {
+        Arm::update_upper_arm(arm_joystick);
+    }
+
+    if (hand_button.is_active()) {
+        Arm::toggle_hand();
     }
 
     if (button_3.is_active())
