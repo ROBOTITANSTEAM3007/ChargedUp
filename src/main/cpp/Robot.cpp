@@ -24,6 +24,7 @@ void Robot::RobotInit() {
 
     Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_8s); // Default: 4s
     // Gyro::imu.Calibrate();
+    Gyro::
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 }
 
@@ -94,7 +95,7 @@ void Robot::TeleopPeriodic() {
     // drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     // this commented drive is here to help me with merging
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
-    
+
     drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     drive_train.orientation = Gyro::imu.GetAngle();
 

@@ -21,8 +21,6 @@
 #include <frc/drive/MecanumDrive.h>
 #include <frc/TimedRobot.h>
 
-#include <frc/ADXL345_I2C.h>
-
 #include <iostream>
 
 #include "Gyro.h"
@@ -60,7 +58,9 @@ class Robot : public frc::TimedRobot {
         back_left_motor_ID { 3 }; //3
 
         // DRIVE
-        Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};
+        Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
+
+        //rev::SparkMaxAlternateEncoder encoder{drive_train.front_left_motor->GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
 
         // STICKS
         // Drive Stick
