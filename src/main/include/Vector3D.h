@@ -18,7 +18,7 @@ struct Vector3D
         z = t_vector.z;
     };
 
-    ~Vector3D();
+    // ~Vector3D();
 
     void set(const Vector3D &t_vector)
     {
@@ -102,6 +102,26 @@ struct Vector3D
             (fabs(x) > t_vector.x ? x : t_vector.x),
             (fabs(y) > t_vector.y ? y : t_vector.y),
             (fabs(z) > t_vector.z ? z : t_vector.z)
+        };
+    }
+
+    Vector3D deadzone(const Vector3D &t_vector)
+    {
+        return Vector3D
+        {
+            (fabs(x) > t_vector.x ? x : 0),
+            (fabs(y) > t_vector.y ? y : 0),
+            (fabs(z) > t_vector.z ? z : 0)
+        };
+    }
+
+    Vector3D deadzone(double value)
+    {
+        return Vector3D
+        {
+            (fabs(x) > value ? x : 0),
+            (fabs(y) > value ? y : 0),
+            (fabs(z) > value ? z : 0)
         };
     }
 

@@ -60,8 +60,6 @@ class Robot : public frc::TimedRobot {
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
-        //rev::SparkMaxAlternateEncoder encoder{drive_train.front_left_motor->GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
-
         // STICKS
         // Drive Stick
         Joystick drive_joystick{0};
@@ -78,8 +76,9 @@ class Robot : public frc::TimedRobot {
         Button button_6{6, drive_joystick.object, PRESS};
         Button button_3{3, drive_joystick.object, PRESS};
 
-        Button hand_button{1, arm_joystick.object, ALL};
-        Button lower_arm_button{4, arm_joystick.object, PRESS};
+        Button auto_arm_button{1, arm_joystick.object, ALL};
+        Button upper_arm_button{3, arm_joystick.object, ALL};
+        Button lower_arm_button{4, arm_joystick.object, ALL};
 
 
     private:
