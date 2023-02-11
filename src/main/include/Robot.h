@@ -51,15 +51,13 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short 
-        front_right_motor_ID { 2 }, //2
-        back_right_motor_ID { 4 }, //4
 
-        gropeyID {9},
+        short front_right_motor_ID { 3 };
+        short back_right_motor_ID { 2};
 
         // Left Side
-        front_left_motor_ID { 1 }, //1
-        back_left_motor_ID { 3 }; //3
+        short front_left_motor_ID { 4 };
+        short back_left_motor_ID { 1 };
 
 
         // DRIVE
