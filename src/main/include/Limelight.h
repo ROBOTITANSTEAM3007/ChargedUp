@@ -27,5 +27,5 @@ public:
     static double get_data(const std::string name, double fail = 0)
     { return get_table()->GetNumber(name, fail); }
 
-    static void retroreflective_auto(Drive &);
+    static void retroreflective_auto_align(Drive &);
 };

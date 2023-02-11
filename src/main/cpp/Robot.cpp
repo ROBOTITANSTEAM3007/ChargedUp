@@ -24,12 +24,16 @@ void Robot::RobotInit() {
     drive_train.front_right_motor->SetInverted(true);
     drive_train.back_right_motor->SetInverted(true);
 
-    Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_8s); // Default: 4s
-    Gyro::imu.Calibrate();
 
 
     
+    Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
+    Gyro::imu.Calibrate();
+
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
+
+    Arm::reset_encoder();
+    Arm::lower_left_arm_motor.Follow(Arm::lower_right_arm_motor);
 }
 
 /**
@@ -103,11 +107,11 @@ void Robot::TeleopPeriodic() {
     drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     drive_train.orientation = Gyro::imu.GetAngle();
 
-    //std::cout << "Encoder: " << Arm::get_encoder() << std::endl;
+
 
     if (button_1.is_active())
     {  
-        Limelight::retroreflective_auto(drive_train);
+        Limelight::retroreflective_auto_align(drive_train);
     }
 
 
@@ -132,18 +136,27 @@ void Robot::TeleopPeriodic() {
         Gyro::imu.Reset();
     }
 
-    // if (lower_arm_button.is_active()) {
-    //     cout << "lower arm moving" << endl;
 
-    //     Arm::update_lower_arm(arm_joystick);
-    // }
-    // else {
-    //     Arm::update_upper_arm(arm_joystick);
-    // }
+    if (upper_arm_button.is_active()) // Rotates Arm
+    {
+        cout << "upper arm moving" << endl;
 
-    // if (hand_button.is_active()) {
-    //     Arm::toggle_hand();
-    // }
+        Arm::target_angle += arm_joystick.get_y(0.15, 10); // Extends & Retracts Arm
+    }
+
+    if (lower_arm_button.is_active())
+    {
+        cout << "lower arm moving" << endl;
+
+        Arm::target_extension += arm_joystick.get_y(0.15, 1);
+    }
+
+    if (auto_arm_button.is_active())
+    {
+        cout << "In Autonomus" << endl;
+
+        Arm::cone_auto_place_high();
+    }
 
     if (button_3.is_active())
     {
@@ -159,6 +172,8 @@ void Robot::TeleopPeriodic() {
 
     // std::cout << (double)imu.GetAngle() << std::endl;
 
+    Arm::update_extension();
+    Arm::update_rotation();
     drive_train.update();
 }
 

@@ -18,7 +18,9 @@ private:
 
     static inline std::chrono::high_resolution_clock::time_point current_tick, previous_tick;
 
-    static inline double deadzone_value {0.02};
+    static inline double 
+    deadzone_value_velocity {0.02},
+    deadzone_value_acceleration {0.001};
 public:
     // FILTER
     static inline auto 
@@ -37,7 +39,7 @@ public:
     acceleration {Vector3D::zero()},
     velocity {Vector3D::zero()},
     position {Vector3D::zero()},
-    normalize {-0.03, 0.05, -1};
+    normalize {0, 0, -1};
 
     // Update the acceleration, velocity, & position
     static void update()
@@ -53,12 +55,13 @@ public:
             // std::cout << delta_time << std::endl;
 
             static double 
-            filtered_acceleration_x = Gyro::acceleration_filter_x.Calculate((double)Gyro::imu.GetAccelX()),
-            filtered_acceleration_y = Gyro::acceleration_filter_y.Calculate((double)Gyro::imu.GetAccelY()),
-            filtered_acceleration_z = Gyro::acceleration_filter_z.Calculate((double)Gyro::imu.GetAccelZ());
+            filtered_acceleration_x = acceleration_filter_x.Calculate((double)Gyro::imu.GetAccelX()),
+            filtered_acceleration_y = acceleration_filter_y.Calculate((double)Gyro::imu.GetAccelY()),
+            filtered_acceleration_z = acceleration_filter_z.Calculate((double)Gyro::imu.GetAccelZ());
 
-            acceleration.set(Vector3D{filtered_acceleration_x, filtered_acceleration_y, filtered_acceleration_z}.add(normalize).minimum(deadzone_value));
-            velocity.set(velocity.add(acceleration.mult(METER_PER_SEC_PER_G).mult(delta_time/MILLISECOND_PER_SECOND)));
+            // acceleration.set(Vector3D{filtered_acceleration_x, filtered_acceleration_y, filtered_acceleration_z}.add(normalize).deadzone(deadzone_value));
+            acceleration.set(Vector3D{(double)Gyro::imu.GetAccelX(), (double)Gyro::imu.GetAccelY(), (double)Gyro::imu.GetAccelZ()}.add(normalize).deadzone(deadzone_value_acceleration));
+            velocity.set(velocity.add(acceleration.mult(METER_PER_SEC_PER_G).mult(delta_time/MILLISECOND_PER_SECOND)).deadzone(deadzone_value_velocity));
             // Vector3D p{velocity.mult(delta_time/MICROSECOND_PER_SECOND)};
             position.set(position.add(velocity));
         }
