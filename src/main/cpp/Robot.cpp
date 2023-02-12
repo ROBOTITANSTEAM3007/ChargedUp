@@ -8,6 +8,8 @@
 
 using namespace std;
 
+PP posPls;
+
 void Robot::RobotInit() {
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
@@ -22,8 +24,12 @@ void Robot::RobotInit() {
     drive_train.front_right_motor->SetInverted(true);
     drive_train.back_right_motor->SetInverted(true);
 
+
+
+    
     Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
     Gyro::imu.Calibrate();
+
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 
     Arm::reset_encoder();
@@ -101,6 +107,8 @@ void Robot::TeleopPeriodic() {
     drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     drive_train.orientation = Gyro::imu.GetAngle();
 
+
+
     if (button_1.is_active())
     {  
         Limelight::retroreflective_auto_align(drive_train);
@@ -127,6 +135,7 @@ void Robot::TeleopPeriodic() {
 
         Gyro::imu.Reset();
     }
+
 
     if (upper_arm_button.is_active()) // Rotates Arm
     {
@@ -155,6 +164,12 @@ void Robot::TeleopPeriodic() {
 
         Gyro::velocity.set(Vector3D::zero());
     }
+
+    std::cout << "Encoder Angle: " << encoder.GetPosition() << std::endl;
+    frc::SmartDashboard::PutNumber("Encoder Pos:", encoder.GetPosition());
+    
+    posPls.PPP();
+
     // std::cout << (double)imu.GetAngle() << std::endl;
 
     Arm::update_extension();

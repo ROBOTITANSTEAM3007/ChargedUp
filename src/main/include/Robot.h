@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+#include "PosPls.h"
+
 #include "Gyro.h"
 #include "Limelight.h"
 #include "Joystick.h"
@@ -49,16 +51,23 @@ class Robot : public frc::TimedRobot {
         // MOTORS
 
         // Right Side
-        short 
-        front_right_motor_ID { 2 }, //2
-        back_right_motor_ID { 4 }, //4
+
+        short front_right_motor_ID { 3 };
+        short back_right_motor_ID { 2};
 
         // Left Side
-        front_left_motor_ID { 1 }, //1
-        back_left_motor_ID { 3 }; //3
+        short front_left_motor_ID { 4 };
+        short back_left_motor_ID { 1 };
+
 
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
+
+
+        rev::CANSparkMax m_gropeyBoi = rev::CANSparkMax{gropeyID, rev::CANSparkMax::MotorType::kBrushless};
+
+        rev::SparkMaxAlternateEncoder encoder{m_gropeyBoi.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
+
 
         // STICKS
         // Drive Stick

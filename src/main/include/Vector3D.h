@@ -11,6 +11,12 @@ struct Vector3D
         z = t_z;
     };
 
+    Vector3D() {
+        x = 0;
+        y = 0;
+        z = 0;
+    };
+
     Vector3D(Vector3D &t_vector)
     {
         x = t_vector.x;
@@ -18,7 +24,6 @@ struct Vector3D
         z = t_vector.z;
     };
 
-    // ~Vector3D();
 
     void set(const Vector3D &t_vector)
     {

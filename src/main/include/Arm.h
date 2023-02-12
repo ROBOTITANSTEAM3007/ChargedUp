@@ -1,12 +1,13 @@
-#pragma once
+// #pragma once
 
-// ARM LAYOUT
-// Hand Motor
-// Claw Pnumatic
-// Shoulder Motor
+// // ARM LAYOUT
+// // Hand Motor
+// // Claw Pnumatic
+// // Shoulder Motor
 
-// Shoulder Encoder
-// 
+// // Shoulder Encoder
+// // 
+
 
 #include <frc/Solenoid.h>
 #include <frc/Encoder.h>
@@ -40,8 +41,10 @@ class Arm {
         lower_left_arm_motor_ID { 6 },
         lower_right_arm_motor_ID { 7 },
 
-        //pneumatics
-        hand_solenoid_channel { 0 },
+
+//         //pneumatics
+//         hand_solenoid_channel { 0 },
+
 
         //encoders
         shoulder_encoder_channel { 0 };
