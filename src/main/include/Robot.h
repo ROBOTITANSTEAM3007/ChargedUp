@@ -52,21 +52,26 @@ class Robot : public frc::TimedRobot {
 
         // Right Side
 
-        short front_right_motor_ID { 3 };
-        short back_right_motor_ID { 2};
+        short front_right_motor_ID { 2 };
+        short back_right_motor_ID { 4 };
 
         // Left Side
-        short front_left_motor_ID { 4 };
-        short back_left_motor_ID { 1 };
+        short front_left_motor_ID { 1 };
+        short back_left_motor_ID { 3 };
 
+
+        // Compressor
+        short compressor_ID {0};
+
+        frc::Compressor compressor{compressor_ID, frc::PneumaticsModuleType::CTREPCM};
 
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
 
-        rev::CANSparkMax m_gropeyBoi = rev::CANSparkMax{gropeyID, rev::CANSparkMax::MotorType::kBrushless};
+        // rev::CANSparkMax m_gropeyBoi = rev::CANSparkMax{gropeyID, rev::CANSparkMax::MotorType::kBrushless};
 
-        rev::SparkMaxAlternateEncoder encoder{m_gropeyBoi.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
+        // rev::SparkMaxAlternateEncoder encoder{m_gropeyBoi.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
 
 
         // STICKS

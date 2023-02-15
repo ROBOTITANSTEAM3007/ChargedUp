@@ -24,10 +24,11 @@ void Limelight::retroreflective_auto_align(Drive &drive)
         percentage_vertical_offset = vertical_offset / 20.5,
         percentage_skew_offset = target_skew;
 
-        std::cout << percentage_skew_offset << std::endl;
+        std::cout << "Horizontal Off-Cent" << percentage_horizontal_offset << std::endl;
+        std::cout << "Skew Off-Cent" << percentage_skew_offset << std::endl;
 
-        drive.speed.set(drive.speed.add(-percentage_vertical_offset * motion_pid.proportion, percentage_horizontal_offset * motion_pid.proportion, 0).minimum(motion_limits));
-    }
+        // Note: tx shows the amount that the robot needs to rotate while ts is the amount of horizontal movment of the robot.
+        drive.speed.set(drive.speed.add(-percentage_vertical_offset * motion_pid.proportion * 0, percentage_skew_offset * motion_pid.proportion, percentage_horizontal_offset * motion_pid.proportion).minimum(motion_limits));}
     else
     {
         std::cout << "No Target!" << std::endl;

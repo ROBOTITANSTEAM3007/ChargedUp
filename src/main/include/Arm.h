@@ -38,8 +38,7 @@ class Arm {
         //motors
         static inline short
         upper_arm_motor_ID { 5 },
-        lower_left_arm_motor_ID { 6 },
-        lower_right_arm_motor_ID { 7 },
+        lower_arm_motor_ID { 6 },
 
 
 //         //pneumatics
@@ -49,7 +48,7 @@ class Arm {
         //encoders
         shoulder_encoder_channel { 0 };
 
-        static inline frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
+        // static inline frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
 
         static inline frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
 
@@ -61,8 +60,7 @@ class Arm {
         //declarations
         static inline rev::CANSparkMax
         upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
-        lower_left_arm_motor{lower_left_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}, // NOTE!: left motor follows right motor!
-        lower_right_arm_motor{lower_right_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}; // Right motor leads.
+        lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
         static void reset_encoder()
         { encoder.Reset();}
@@ -87,7 +85,7 @@ class Arm {
                 bool finished_extension {update_extension()};
                 if (finished_extension)
                 {
-                    hand_solenoid.Set(true); // Relases claw
+                    // hand_solenoid.Set(true); // Relases claw
                 }
             }
         }
@@ -96,7 +94,7 @@ class Arm {
         {
             double extension_offset{fmax(fmin(target_extension, MAX_ARM_EXTENSION), MIN_ARM_EXTENSION) - extension()};
 
-            lower_right_arm_motor.Set(fmin(extension_offset, 1));
+            lower_arm_motor.Set(fmin(extension_offset, 1));
 
             if (fabs(extension_offset) < 0.01)
             {

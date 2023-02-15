@@ -22,14 +22,6 @@ private:
     deadzone_value_velocity {0.02},
     deadzone_value_acceleration {0.001};
 public:
-    // FILTER
-    static inline auto 
-    acceleration_filter_x = frc::LinearFilter<double>::MovingAverage(10),
-    acceleration_filter_y = frc::LinearFilter<double>::MovingAverage(10),
-    acceleration_filter_z = frc::LinearFilter<double>::MovingAverage(10);
-
-    // frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(5);
-
     // IMU
     static inline frc::ADIS16470_IMU imu{};
     // NOTE: I think the IMU measures acceleration in 'g' (g-force)
@@ -51,14 +43,7 @@ public:
             // 1 Second = 1,000,000 Microseconds
             // 1 Second = 1,000 Milliseconds
             double delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_tick - previous_tick).count();
-
-            // std::cout << delta_time << std::endl;
-
-            static double 
-            filtered_acceleration_x = acceleration_filter_x.Calculate((double)Gyro::imu.GetAccelX()),
-            filtered_acceleration_y = acceleration_filter_y.Calculate((double)Gyro::imu.GetAccelY()),
-            filtered_acceleration_z = acceleration_filter_z.Calculate((double)Gyro::imu.GetAccelZ());
-
+            
             // acceleration.set(Vector3D{filtered_acceleration_x, filtered_acceleration_y, filtered_acceleration_z}.add(normalize).deadzone(deadzone_value));
             acceleration.set(Vector3D{(double)Gyro::imu.GetAccelX(), (double)Gyro::imu.GetAccelY(), (double)Gyro::imu.GetAccelZ()}.add(normalize).deadzone(deadzone_value_acceleration));
             velocity.set(velocity.add(acceleration.mult(METER_PER_SEC_PER_G).mult(delta_time/MILLISECOND_PER_SECOND)).deadzone(deadzone_value_velocity));

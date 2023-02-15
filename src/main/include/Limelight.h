@@ -21,6 +21,7 @@ private:
     };
 
 public:
+
     static void put_data(const std::string name, double data)
     { get_table()->PutNumber(name, data); }
 

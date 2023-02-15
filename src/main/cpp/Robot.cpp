@@ -24,8 +24,6 @@ void Robot::RobotInit() {
     drive_train.front_right_motor->SetInverted(true);
     drive_train.back_right_motor->SetInverted(true);
 
-
-
     
     Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
     Gyro::imu.Calibrate();
@@ -33,7 +31,6 @@ void Robot::RobotInit() {
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 
     Arm::reset_encoder();
-    Arm::lower_left_arm_motor.Follow(Arm::lower_right_arm_motor);
 }
 
 /**
@@ -84,8 +81,8 @@ void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
     Gyro::update();
 
-    std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
-    std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
+    // std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
+    // std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
 
     frc::SmartDashboard::PutNumber("AX", Gyro::acceleration.x);
     frc::SmartDashboard::PutNumber("AY", Gyro::acceleration.y);
@@ -155,7 +152,7 @@ void Robot::TeleopPeriodic() {
     {
         cout << "In Autonomus" << endl;
 
-        Arm::cone_auto_place_high();
+        // Arm::cone_auto_place_high();
     }
 
     if (button_3.is_active())
@@ -165,8 +162,8 @@ void Robot::TeleopPeriodic() {
         Gyro::velocity.set(Vector3D::zero());
     }
 
-    std::cout << "Encoder Angle: " << encoder.GetPosition() << std::endl;
-    frc::SmartDashboard::PutNumber("Encoder Pos:", encoder.GetPosition());
+    // std::cout << "Encoder Angle: " << Arm::encoder.Get() << std::endl;
+    // frc::SmartDashboard::PutNumber("Encoder Pos:", Arm::encoder.Get());
     
     posPls.PPP();
 
