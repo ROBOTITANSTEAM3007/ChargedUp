@@ -28,6 +28,7 @@
 #include "Gyro.h"
 #include "Limelight.h"
 #include "Joystick.h"
+#include "Vector3D.h"
 #include "Button.h"
 #include "Drive.h"
 #include "Arm.h"
@@ -62,11 +63,6 @@ class Robot : public frc::TimedRobot {
 
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
-
-
-        rev::CANSparkMax m_gropeyBoi = rev::CANSparkMax{gropeyID, rev::CANSparkMax::MotorType::kBrushless};
-
-        rev::SparkMaxAlternateEncoder encoder{m_gropeyBoi.GetAlternateEncoder(rev::CANEncoder::AlternateEncoderType::kQuadrature, 8192)};
 
 
         // STICKS
