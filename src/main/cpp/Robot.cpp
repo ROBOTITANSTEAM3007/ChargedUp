@@ -32,8 +32,6 @@ void Robot::RobotInit() {
 
     Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 
-    Arm::reset_encoder();
-    Arm::lower_left_arm_motor.Follow(Arm::lower_right_arm_motor);
 }
 
 /**
@@ -137,26 +135,6 @@ void Robot::TeleopPeriodic() {
     }
 
 
-    if (upper_arm_button.is_active()) // Rotates Arm
-    {
-        cout << "upper arm moving" << endl;
-
-        Arm::target_angle += arm_joystick.get_y(0.15, 10); // Extends & Retracts Arm
-    }
-
-    if (lower_arm_button.is_active())
-    {
-        cout << "lower arm moving" << endl;
-
-        Arm::target_extension += arm_joystick.get_y(0.15, 1);
-    }
-
-    if (auto_arm_button.is_active())
-    {
-        cout << "In Autonomus" << endl;
-
-        Arm::cone_auto_place_high();
-    }
 
     if (button_3.is_active())
     {
@@ -165,15 +143,11 @@ void Robot::TeleopPeriodic() {
         Gyro::velocity.set(Vector3D::zero());
     }
 
-    std::cout << "Encoder Angle: " << encoder.GetPosition() << std::endl;
-    frc::SmartDashboard::PutNumber("Encoder Pos:", encoder.GetPosition());
     
     posPls.PPP();
 
     // std::cout << (double)imu.GetAngle() << std::endl;
 
-    Arm::update_extension();
-    Arm::update_rotation();
     drive_train.update();
 }
 

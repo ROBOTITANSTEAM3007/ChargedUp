@@ -17,7 +17,7 @@ class PP {
         //Real time
         double delta_time;
 
-        //Acceleration (Actually jerk)
+        //Acceleration
         Vector3D Acceleration;
 
         //Jerk

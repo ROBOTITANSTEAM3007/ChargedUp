@@ -42,31 +42,24 @@ struct Vector3D
     Vector3D get()
     { return Vector3D{x, y, z}; }
 
-
     // Addition & Subtraction
-    Vector3D add(const Vector3D &t_vector)
+    Vector3D operator + (const Vector3D &t_vector)
     { return Vector3D{x + t_vector.x, y + t_vector.y, z + t_vector.z}; }
 
-    Vector3D sub(const Vector3D &t_vector)
+    Vector3D operator - (const Vector3D &t_vector)
     { return Vector3D{x - t_vector.x, y - t_vector.y, z - t_vector.z}; }
 
-    Vector3D add(double t_x, double t_y, double t_z)
-    { return Vector3D{x + t_x, y + t_y, z + t_z}; }
-
-    Vector3D sub(double t_x, double t_y, double t_z)
-    { return Vector3D{x - t_x, y - t_y, z - t_z}; }
-
     // Division & Multiplication
-    Vector3D div(double value)
+    Vector3D mult(double value)
     { return Vector3D{x / value, y / value, z / value}; }
 
-    Vector3D mult(double value)
+    Vector3D div(double value)
     { return Vector3D{x * value, y * value, z * value}; }
 
-    Vector3D div(const Vector3D &t_vector)
+    Vector3D operator / (const Vector3D &t_vector)
     { return Vector3D{x / t_vector.x, y / t_vector.y, z / t_vector.z}; }
 
-    Vector3D mult(const Vector3D &t_vector)
+    Vector3D operator * (const Vector3D &t_vector)
     { return Vector3D{x * t_vector.x, y * t_vector.y, z * t_vector.z}; }
 
     // Other

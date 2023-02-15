@@ -12,6 +12,8 @@
 #include <frc/Solenoid.h>
 #include <frc/Encoder.h>
 #include <frc/DutyCycleEncoder.h>
+#include <frc/AnalogInput.h>
+#include <fstream>
 
 #include <rev/CANSparkMax.h>
 
@@ -35,90 +37,66 @@
 //        35.3in is the maximum extension of the arm from 23.7in.
 class Arm {
     private:
+
+        frc::AnalogInput analogExt{0};
+
+        std::fstream fs;
+
+
         //motors
-        static inline short
+        short
         upper_arm_motor_ID { 5 },
         lower_left_arm_motor_ID { 6 },
         lower_right_arm_motor_ID { 7 },
-
-
-//         //pneumatics
-//         hand_solenoid_channel { 0 },
-
-
+        //pneumatics
+         hand_solenoid_channel { 0 },
         //encoders
         shoulder_encoder_channel { 0 };
 
-        static inline frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
+        double angle_offset;
 
-        static inline frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
+        float maxArmLength = 54.4;
+
+        float calibPoint1 = 0, calibPoint2 = 0;
+
+        float extensionSlope = 0;
+
+        float extensionLength; //measured in inches sadly.
+
+        float extension_offset;
+
+        frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
+
+        frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
 
     public:
-        static inline double 
+        double 
         target_extension{0}, // 0 - 35.3 inches
         target_angle{0};
 
         //declarations
-        static inline rev::CANSparkMax
+        rev::CANSparkMax
         upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
         lower_left_arm_motor{lower_left_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}, // NOTE!: left motor follows right motor!
         lower_right_arm_motor{lower_right_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}; // Right motor leads.
 
-        static void reset_encoder()
+        void reset_encoder()
         { encoder.Reset();}
 
-        static double rotation()
-        { return encoder.GetAbsolutePosition() * 360; } // Degrees
-        
-        static double extension()
-        { return /*extension measurment here*/ 0;}
+        Arm();
 
-        static double distance()
+        double rotation()
+        { return encoder.GetAbsolutePosition(); } // Degrees
+        
+        double extension()
+        { return extensionLength;}
+
+        double distance()
         { return sqrt(pow(/*arm extension*/1, 2) * pow(UPPER_ARM_LENGTH, 2)); }
 
-        static void cone_auto_place_high()
-        {
-            target_angle = /*Correct Angle Here*/0;
-            bool finished_rotation {update_rotation()};
+        void calibrate(frc::Joystick *stick); //Linear regression from arm at shortest and longest extension
 
-            if (finished_rotation)
-            {
-                target_extension = /*Correct Extension Here*/0;
-                bool finished_extension {update_extension()};
-                if (finished_extension)
-                {
-                    hand_solenoid.Set(true); // Relases claw
-                }
-            }
-        }
+        void cone_auto_place_high();
 
-        static bool update_extension()
-        {
-            double extension_offset{fmax(fmin(target_extension, MAX_ARM_EXTENSION), MIN_ARM_EXTENSION) - extension()};
-
-            lower_right_arm_motor.Set(fmin(extension_offset, 1));
-
-            if (fabs(extension_offset) < 0.01)
-            {
-                std::cout << "Correct Extension" << extension() << std::endl;
-                return true;
-            }
-
-            return false;
-        }
-
-        static bool update_rotation()
-        {
-            double angle_offset{fmax(fmin(target_angle, MAX_ARM_ROTATION), MIN_ARM_ROTATION) - rotation()};
-
-            upper_arm_motor.Set(fmin(angle_offset, 1));
-
-            if (fabs(angle_offset) < 0.01)
-            {
-                std::cout << "Correct Rotation" << rotation() << std::endl;
-                return true;
-            }
-
-            return false;
-        }
+        void periodic();
 };  
