@@ -57,8 +57,6 @@ void Robot::AutonomousInit() {
     selected_auto = auto_chooser.GetSelected();
     selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
 
-    // fmt::print("Auto selected: {}\n", selected_auto);
-
     if (selected_auto == auto_profile_testing) {
         
     } else {
@@ -100,8 +98,9 @@ void Robot::TeleopPeriodic() {
     // this commented drive is here to help me with merging
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
 
-    drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
-    drive_train.orientation = Gyro::imu.GetAngle();
+    drive_train.speed = Vector3D{-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3)};
+    
+    // drive_train.orientation = Gyro::imu.GetAngle();
 
 
 
@@ -132,20 +131,61 @@ void Robot::TeleopPeriodic() {
         Gyro::imu.Reset();
     }
 
-
-
     if (button_3.is_active())
     {
         cout << "Button 3 Velocity Reset" << endl;
 
-        Gyro::velocity.set(Vector3D::zero());
+        Gyro::velocity = Vector3D::zero();
     }
+
+
+    // Manual Arm Control
+    if (upper_arm_button.is_active())
+    {
+        upper_arm_motor.Set(-arm_joystick.get_y(0.15, 1));
+
+        // if (grab_position_switch.is_active() && arm_joystick.get_y(0.15, 1) < 0)
+        // {
+        //     upper_arm_motor.Set(0);
+        // }
+    } 
+    else
+    {
+        upper_arm_motor.Set(0);
+    }
+
+    if (lower_arm_button.is_active())
+    {
+        lower_arm_motor.Set(arm_joystick.get_y(0.15, 1));
+
+        // if (extension_switch_1.is_active() && extension_switch_2.is_active() && -arm_joystick.get_y(0.15, 1) < 0)
+        // {
+        //     lower_arm_motor.Set(0);
+        // }
+    }
+    else
+    {
+        lower_arm_motor.Set(0);
+    }
+
+    if (auto_arm_button.is_active())
+    {
+        hand_solenoid.Toggle();
+    }
+
+    if (pole_arm_button.is_active())
+    {
+        pole_solenoid.Toggle();
+    }
+
+    frc::SmartDashboard::PutNumber("Poten Value", extension_potentiometer.GetVoltage());
 
     
     posPls.PPP();
 
     // std::cout << (double)imu.GetAngle() << std::endl;
 
+    // robot_arm.periodic();
     drive_train.update();
 }
 
