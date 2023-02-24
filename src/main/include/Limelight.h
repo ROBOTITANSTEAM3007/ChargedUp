@@ -14,12 +14,13 @@ class Limelight
 {
 private:
 
+public:
     static double convert_angle(double);
 
-public:
     // Motion Properties
     static inline PID motion_pid{0.25, 0, 0};
     static inline Vector3D motion_limits{0.25, 0.25, 0.5};
+    static inline double target_vertical_offset{0};
 
     // Limelight Networktable Values
     static inline double 

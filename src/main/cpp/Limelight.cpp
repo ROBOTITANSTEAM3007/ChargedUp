@@ -28,7 +28,7 @@ void Limelight::retroreflective_auto_align(Drive &drive)
 
         percentage_horizontal_offset = horizontal_offset / 27;
         percentage_vertical_offset = vertical_offset / 20.5;
-        percentage_skew_offset = convert_angle(target_skew) / 10;
+        percentage_skew_offset = convert_angle(target_skew);
 
         // if (fabs(percentage_skew_offset) > 0.3)
         // {
@@ -39,11 +39,22 @@ void Limelight::retroreflective_auto_align(Drive &drive)
         //     percentage_skew_offset = 0;
         // }
 
+        if (fabs(percentage_skew_offset) < 0.1)
+        {
+            percentage_vertical_offset = -0.5;
+            percentage_skew_offset = 0;
+        }
+        else
+        {
+            percentage_vertical_offset = 0;
+        }
+
+
         frc::SmartDashboard::PutNumber("Skew Offset", percentage_skew_offset);
 
-        drive.speed *= Vector3D{1, 1, 0};
+        // drive.speed *= Vector3D{1, 1, 0};
         // Note: tx shows the amount that the robot needs to rotate while ts is the amount of horizontal movment of the robot.
-        drive.speed += Vector3D{0, percentage_skew_offset * motion_pid.proportion, percentage_horizontal_offset * motion_pid.proportion}.minimum(motion_limits);
+        drive.speed += Vector3D{percentage_vertical_offset * motion_pid.proportion, percentage_skew_offset * motion_pid.proportion, percentage_horizontal_offset * motion_pid.proportion * 0}.minimum(motion_limits);
         drive.orientation = units::degree_t {0};
     }
     else
