@@ -65,7 +65,6 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-
     if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
     } else {
@@ -98,7 +97,7 @@ void Robot::TeleopPeriodic() {
     // this commented drive is here to help me with merging
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
 
-    drive_train.speed = Vector3D{-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3)};
+    drive_train.speed = Vector3D{-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.5, 0.3)};
     
     // drive_train.orientation = Gyro::imu.GetAngle();
 
@@ -142,43 +141,59 @@ void Robot::TeleopPeriodic() {
     // Manual Arm Control
     if (upper_arm_button.is_active())
     {
-        upper_arm_motor.Set(-arm_joystick.get_y(0.15, 1));
+        double joystick_value = -arm_joystick.get_y(0.15, 1);
 
-        // if (grab_position_switch.is_active() && arm_joystick.get_y(0.15, 1) < 0)
-        // {
-        //     upper_arm_motor.Set(0);
-        // }
+        if (!grab_position_switch.is_active() && joystick_value > 0)
+        {
+            upper_arm_motor.Set(0);
+        }
+        else
+        {
+            upper_arm_motor.Set(joystick_value);
+        }
     } 
     else
     {
         upper_arm_motor.Set(0);
     }
 
+
     if (lower_arm_button.is_active())
     {
-        lower_arm_motor.Set(arm_joystick.get_y(0.15, 1));
+        double joystick_value = arm_joystick.get_y(0.15, 1);
 
-        // if (extension_switch_1.is_active() && extension_switch_2.is_active() && -arm_joystick.get_y(0.15, 1) < 0)
-        // {
-        //     lower_arm_motor.Set(0);
-        // }
+        if (!extension_switch_1.is_active() || !extension_switch_2.is_active() && (-joystick_value) < 0)
+        {
+            lower_arm_motor.Set(0);
+        }
+        else
+        {
+            lower_arm_motor.Set(joystick_value);
+        }
     }
     else
     {
         lower_arm_motor.Set(0);
     }
 
+
     if (auto_arm_button.is_active())
     {
         hand_solenoid.Toggle();
     }
+
 
     if (pole_arm_button.is_active())
     {
         pole_solenoid.Toggle();
     }
 
-    frc::SmartDashboard::PutNumber("Poten Value", extension_potentiometer.GetVoltage());
+
+
+    frc::SmartDashboard::PutNumber("Encoder", (double)encoder.GetAbsolutePosition());
+    frc::SmartDashboard::PutNumber("Extension Switch 1", extension_switch_1.is_active());
+    frc::SmartDashboard::PutNumber("Extension Switch 2", extension_switch_2.is_active());
+    frc::SmartDashboard::PutNumber("Poten Value", get_potentiometer());
 
     
     posPls.PPP();

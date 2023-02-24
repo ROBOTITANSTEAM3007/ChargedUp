@@ -48,5 +48,5 @@ public:
 
     // UPDATES ROBOT DRIVE
     void update()
-    { controller->DriveCartesian(speed.x, speed.y, speed.z, orientation); }
+    { controller->DriveCartesian(fmax(fmin(speed.x, 1), -1), fmax(fmin(speed.y, 1), -1), fmax(fmin(speed.z, 1), -1), orientation); }
 };
