@@ -163,7 +163,7 @@ class Robot : public frc::TimedRobot {
             // }
             // else
             // {
-                drive_train.speed = Vector3D{0.2, 0, 0}.minimum(Limelight::motion_limits);
+                drive_train.speed = Vector2D{0.2, 0}.minimum(Limelight::motion_limits);
             //     Limelight::put_data("pipeline", 0); // Pipe line of one target
 
             //     visible_target = Limelight::get_data("tv", 0);
@@ -175,8 +175,8 @@ class Robot : public frc::TimedRobot {
 
             //     }
             // }
-
-            drive_train.update();
+            
+            drive_train.periodic();
         }
 
 // End Of ARM

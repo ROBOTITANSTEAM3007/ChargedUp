@@ -25,8 +25,9 @@ void Robot::RobotInit() {
     drive_train.front_left_motor->RestoreFactoryDefaults();
     drive_train.back_left_motor->RestoreFactoryDefaults();
 
-    drive_train.front_right_motor->SetInverted(true);
-    drive_train.back_right_motor->SetInverted(true);
+    // Motors are now following each other
+    drive_train.back_left_motor->Follow(*drive_train.front_left_motor);
+    drive_train.back_right_motor->Follow(*drive_train.front_right_motor);
 
     // encoder.
 
@@ -75,7 +76,7 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {
     if (selected_auto == auto_profile_whole_hog) {
-        drive_train.speed = Vector3D{0.8, 0, 0}.minimum(Limelight::motion_limits);
+        drive_train.speed = Vector2D{0.8, 0};
     }
     else if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
@@ -111,12 +112,11 @@ void Robot::TeleopPeriodic() {
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
 
     drive_train.speed = 
-    Vector3D
-        {
-        -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5), 
-        to_sigmoidal(drive_joystick.get_x(0.2, 1.0), 5), 
-        to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
-        };
+    Vector2D
+    {
+    -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5),
+    to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
+    };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0.15, 1.0), 5) << endl;
 
@@ -125,9 +125,7 @@ void Robot::TeleopPeriodic() {
 
     // Activate Limelight Auto Align
     if (button_1.is_active())
-    {  
-        Limelight::retroreflective_auto_align(drive_train);
-    }
+    { Limelight::retroreflective_auto_align(drive_train); }
 
     // Toggle Limelight LED
     if (button_2.is_active())
@@ -225,8 +223,7 @@ void Robot::TeleopPeriodic() {
 
     // std::cout << (double)imu.GetAngle() << std::endl;
 
-    // robot_arm.periodic();
-    drive_train.update();
+    drive_train.periodic();
 }
 
 void Robot::DisabledInit() {}
