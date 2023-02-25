@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define M_PI 3.14159265358979323846
+
 #include <string>
 #include <chrono>
 
@@ -108,6 +110,14 @@ class Robot : public frc::TimedRobot {
         Switch extension_switch_1{extension_switch_1_port, ALL};// DIO 2 & 3 are extension arm limit switches
         Switch extension_switch_2{extension_switch_2_port, ALL};
 
+        double to_sigmoidal(double input, double scale) // Anything larger than a scale of 5 is optimal
+        {
+            if (input == 0)
+            { return 0; }
+
+            return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
+        }
+
         double previous_potentiometer_value = 0;
 
         double get_potentiometer()
@@ -125,7 +135,7 @@ class Robot : public frc::TimedRobot {
         void autonomus_place_cone()
         {
             // Place Cone In Auto
-
+            Limelight::put_data("ledMode", 3);
             Limelight::put_data("pipeline", 0);
 
             double visible_target = Limelight::get_data("tv", 0);

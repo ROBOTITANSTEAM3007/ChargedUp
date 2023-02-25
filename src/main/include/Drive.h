@@ -5,6 +5,8 @@
 
 #include "Vector3D.h"
 
+// 6 in Diameter Wheels
+
 struct PID
 {
     double

@@ -24,11 +24,12 @@ void Robot::RobotInit() {
     drive_train.front_right_motor->SetInverted(true);
     drive_train.back_right_motor->SetInverted(true);
 
-    
-    Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
-    Gyro::imu.Calibrate();
+    // encoder.
 
-    Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
+    // Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
+    // Gyro::imu.Calibrate();
+
+    // Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
 
 }
 
@@ -65,6 +66,8 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
+    autonomus_place_cone();
+
     if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
     } else {
@@ -75,40 +78,48 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    Gyro::update();
+    // Gyro::update();
 
     // std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
     // std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
 
-    frc::SmartDashboard::PutNumber("AX", Gyro::acceleration.x);
-    frc::SmartDashboard::PutNumber("AY", Gyro::acceleration.y);
-    frc::SmartDashboard::PutNumber("AZ", Gyro::acceleration.z);
+    // frc::SmartDashboard::PutNumber("AX", Gyro::acceleration.x);
+    // frc::SmartDashboard::PutNumber("AY", Gyro::acceleration.y);
+    // frc::SmartDashboard::PutNumber("AZ", Gyro::acceleration.z);
 
-    frc::SmartDashboard::PutNumber("VX", Gyro::velocity.x);
-    frc::SmartDashboard::PutNumber("VY", Gyro::velocity.y);
-    frc::SmartDashboard::PutNumber("VZ", Gyro::velocity.z);
+    // frc::SmartDashboard::PutNumber("VX", Gyro::velocity.x);
+    // frc::SmartDashboard::PutNumber("VY", Gyro::velocity.y);
+    // frc::SmartDashboard::PutNumber("VZ", Gyro::velocity.z);
 
-    frc::SmartDashboard::PutNumber("PX", Gyro::position.x);
-    frc::SmartDashboard::PutNumber("PY", Gyro::position.y);
-    frc::SmartDashboard::PutNumber("PZ", Gyro::position.z);
+    // frc::SmartDashboard::PutNumber("PX", Gyro::position.x);
+    // frc::SmartDashboard::PutNumber("PY", Gyro::position.y);
+    // frc::SmartDashboard::PutNumber("PZ", Gyro::position.z);
 
     // Default: Twist, X, Y
     // drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
     // this commented drive is here to help me with merging
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
 
-    drive_train.speed = Vector3D{-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.5, 0.3)};
+    drive_train.speed = 
+    Vector3D
+        {
+        -to_sigmoidal(drive_joystick.get_y(0.15, 1.0), 5), 
+        to_sigmoidal(drive_joystick.get_x(0.15, 1.0), 5), 
+        drive_joystick.get_twist(0.5, 0.3)
+        };
     
+    // cout << to_sigmoidal(drive_joystick.get_twist(0.15, 1.0), 5) << endl;
+
     // drive_train.orientation = Gyro::imu.GetAngle();
 
 
-
+    // Activate Limelight Auto Align
     if (button_1.is_active())
     {  
         Limelight::retroreflective_auto_align(drive_train);
     }
 
-
+    // Toggle Limelight LED
     if (button_2.is_active())
     {  
         std::cout << "Button 2" << std::endl;
@@ -123,27 +134,29 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    if (button_6.is_active()) {
+    // if (button_6.is_active()) {
         
-        cout << "Button 6 Gyro Reset" << endl;
+    //     cout << "Button 6 Gyro Reset" << endl;
 
-        Gyro::imu.Reset();
-    }
+    //     Gyro::imu.Reset();
+    // }
 
-    if (button_3.is_active())
-    {
-        cout << "Button 3 Velocity Reset" << endl;
+    // if (button_3.is_active())
+    // {
+    //     cout << "Button 3 Velocity Reset" << endl;
 
-        Gyro::velocity = Vector3D::zero();
-    }
+    //     Gyro::velocity = Vector3D::zero();
+    // }
 
 
     // Manual Arm Control
+
+    // Arm Extension
     if (upper_arm_button.is_active())
     {
-        double joystick_value = -arm_joystick.get_y(0.15, 1);
+        double joystick_value = arm_joystick.get_y(0.15, 1);
 
-        if (!grab_position_switch.is_active() && joystick_value > 0)
+        if (grab_position_switch.is_active() && joystick_value > 0)
         {
             upper_arm_motor.Set(0);
         }
@@ -157,12 +170,12 @@ void Robot::TeleopPeriodic() {
         upper_arm_motor.Set(0);
     }
 
-
+    // Arm Rotation
     if (lower_arm_button.is_active())
     {
-        double joystick_value = arm_joystick.get_y(0.15, 1);
+        double joystick_value = -arm_joystick.get_y(0.15, 1);
 
-        if (!extension_switch_1.is_active() || !extension_switch_2.is_active() && (-joystick_value) < 0)
+        if ((extension_switch_1.is_active() || extension_switch_2.is_active()) && (-joystick_value) < 0)
         {
             lower_arm_motor.Set(0);
         }
@@ -176,23 +189,25 @@ void Robot::TeleopPeriodic() {
         lower_arm_motor.Set(0);
     }
 
-
+    // Toggle Hand Grip
     if (auto_arm_button.is_active())
     {
         hand_solenoid.Toggle();
     }
 
-
+    // Toggle Pole
     if (pole_arm_button.is_active())
     {
         pole_solenoid.Toggle();
     }
 
 
+    // extension_switch_1.
 
-    frc::SmartDashboard::PutNumber("Encoder", (double)encoder.GetAbsolutePosition());
+    frc::SmartDashboard::PutNumber("Encoder", (double)encoder.GetPositionOffset());
     frc::SmartDashboard::PutNumber("Extension Switch 1", extension_switch_1.is_active());
     frc::SmartDashboard::PutNumber("Extension Switch 2", extension_switch_2.is_active());
+    frc::SmartDashboard::PutNumber("Rotation Switch", grab_position_switch.is_active());
     frc::SmartDashboard::PutNumber("Poten Value", get_potentiometer());
 
     
