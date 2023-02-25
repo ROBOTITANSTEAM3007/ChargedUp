@@ -9,14 +9,14 @@
 #include <iostream>
 
 #include "Drive.h"
+namespace LED { enum {ON, OFF, TOGGLE}; }
+namespace CAM { enum {DRIVER, COMPUTER, TOGGLE}; }
 
 class Limelight
 {
 private:
 
 public:
-    static double convert_angle(double);
-
     // Motion Properties
     static inline PID motion_pid{0.25, 0, 0};
     static inline Vector2D motion_limits{0.25, 0.5};
@@ -51,5 +51,6 @@ public:
 
     static void retroreflective_auto_align(Drive &);
 
-    static void toggle_led(int);
+    static void toggle_led(short = LED::TOGGLE);
+    static void toggle_camera(short = CAM::TOGGLE);
 };

@@ -175,7 +175,7 @@ class Robot : public frc::TimedRobot {
 
             //     }
             // }
-            
+
             drive_train.periodic();
         }
 
@@ -192,10 +192,10 @@ class Robot : public frc::TimedRobot {
         // PRESS = Only once on press down            
         // RELEASE = Only once on release   
 
-        Button button_1{1, drive_joystick.object, ALL};
-        Button button_2{2, drive_joystick.object, PRESS};
+        Button button_1{1, drive_joystick.object, ALL}; // Limelight Autoalign
+        Button button_2{2, drive_joystick.object, PRESS}; // Toggle LED
         Button button_6{6, drive_joystick.object, PRESS};
-        Button button_3{3, drive_joystick.object, PRESS};
+        Button button_3{3, drive_joystick.object, PRESS}; // Toggle Camera Mode
 
         Button auto_arm_button{1, arm_joystick.object, PRESS};
         Button pole_arm_button{2, arm_joystick.object, PRESS};
