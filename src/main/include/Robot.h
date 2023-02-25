@@ -5,12 +5,16 @@
 
 #pragma once
 
+#define M_PI 3.14159265358979323846
+
 #include <string>
 #include <chrono>
 
 #include <fmt/core.h>
+#include <cameraserver/CameraServer.h>
 
 #include <rev/CANSparkMax.h>
+#include <cscore_oo.h>
 
 #include <frc/PneumaticsControlModule.h>
 #include <frc/Compressor.h>
@@ -85,6 +89,7 @@ class Robot : public frc::TimedRobot {
 
         extension_switch_1_port { 2 },
         extension_switch_2_port { 3 },
+
         shoulder_encoder_port { 4 },
         
         extension_potentiometer_port { 0 };
@@ -108,6 +113,14 @@ class Robot : public frc::TimedRobot {
         Switch extension_switch_1{extension_switch_1_port, ALL};// DIO 2 & 3 are extension arm limit switches
         Switch extension_switch_2{extension_switch_2_port, ALL};
 
+        double to_sigmoidal(double input, double scale) // Anything larger than a scale of 5 is optimal
+        {
+            if (input == 0)
+            { return 0; }
+
+            return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
+        }
+
         double previous_potentiometer_value = 0;
 
         double get_potentiometer()
@@ -125,41 +138,45 @@ class Robot : public frc::TimedRobot {
         void autonomus_place_cone()
         {
             // Place Cone In Auto
+            // For Now, The Robot Drives Forward.
 
-            Limelight::put_data("pipeline", 0);
 
-            double visible_target = Limelight::get_data("tv", 0);
+            // Limelight::put_data("ledMode", 3);
+            // Limelight::put_data("pipeline", 0);
 
-            if (visible_target)
-            {
-                double target_skew = Limelight::get_data("ts", 0);
-                double vertical_offset = Limelight::get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
+            // double visible_target = Limelight::get_data("tv", 0);
 
-                double vertical_offset_percentage = (Limelight::target_vertical_offset - vertical_offset) / 20.5;
-                double skew_offset_percentage = Limelight::convert_angle(target_skew) / 10;
+            // if (visible_target)
+            // {
+            //     double target_skew = Limelight::get_data("ts", 0);
+            //     double vertical_offset = Limelight::get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
 
-                if (skew_offset_percentage < 0.1)
-                {
-                    vertical_offset_percentage = 0;
-                }
+            //     double vertical_offset_percentage = -(Limelight::target_vertical_offset - vertical_offset) / 20.5;
+            //     // double skew_offset_percentage = Limelight::convert_angle(target_skew) / 10;
 
-                drive_train.speed = Vector3D{vertical_offset_percentage * Limelight::motion_pid.proportion, skew_offset_percentage * Limelight::motion_pid.proportion, 0}.minimum(Limelight::motion_limits);
-            }
-            else
-            {
-                Limelight::put_data("pipeline", 0); // Pipe line of one target
+            //     // if (skew_offset_percentage < 0.1)
+            //     // {
+            //     //     vertical_offset_percentage = 0;
+            //     // }
 
-                visible_target = Limelight::get_data("tv", 0);
+            //     drive_train.speed = Vector3D{vertical_offset_percentage * Limelight::motion_pid.proportion, 0, 0}.minimum(Limelight::motion_limits);
+            // }
+            // else
+            // {
+                drive_train.speed = Vector2D{0.2, 0}.minimum(Limelight::motion_limits);
+            //     Limelight::put_data("pipeline", 0); // Pipe line of one target
+
+            //     visible_target = Limelight::get_data("tv", 0);
             
-                if (visible_target)
-                {
-                    Limelight::put_data("pipeline", 0); 
+            //     if (visible_target)
+            //     {
+            //         Limelight::put_data("pipeline", 0); 
                     
 
-                }
-            }
-
-            drive_train.update();
+            //     }
+            // }
+            
+            drive_train.periodic();
         }
 
 // End Of ARM
@@ -189,6 +206,7 @@ class Robot : public frc::TimedRobot {
     private:
         frc::SendableChooser<std::string> auto_chooser;
         const std::string auto_profile_default = "Default";
-        const std::string auto_profile_testing = "Testing";
+        const std::string auto_profile_testing = "Chill";
+        const std::string auto_profile_whole_hog = "No Chill";
         std::string selected_auto;
 };

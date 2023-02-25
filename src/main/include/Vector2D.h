@@ -22,57 +22,63 @@ struct Vector2D
         y = 0;
     };
 
-    // ~Vector2D();
+    void operator = (const Vector2D &t_vector)
+    { x = t_vector.x; y = t_vector.y; }
 
-    void set(const Vector2D &t_vector)
-    {
-        x = t_vector.x;
-        y = t_vector.y;
-    }
+    void operator += (const Vector2D &t_vector)
+    {  x += t_vector.x; y += t_vector.y; }
 
-    void set(double t_x, double t_y)
-    {
-        x = t_x;
-        y = t_y;
-    }
+    void operator += (double value)
+    {  x += value; y += value; }
+
+    void operator -= (const Vector2D &t_vector)
+    { x -= t_vector.x; y -= t_vector.y; }
+
+    void operator -= (double value)
+    { x -= value; y -= value; }
+
+    void operator *= (const Vector2D &t_vector)
+    { x *= t_vector.x; y *= t_vector.y; }
+
+    void operator *= (double value)
+    { x *= value; y *= value; }
+
+    void operator /= (const Vector2D &t_vector)
+    { x /= t_vector.x; y /= t_vector.y; }
+
+    void operator /= (double value)
+    { x /= value; y /= value; }
 
     Vector2D get()
     { return Vector2D{x, y}; }
 
-
     // Addition & Subtraction
-    Vector2D add(const Vector2D &t_vector)
+    Vector2D operator + (const Vector2D &t_vector)
     { return Vector2D{x + t_vector.x, y + t_vector.y}; }
 
-    Vector2D sub(const Vector2D &t_vector)
+    Vector2D operator - (const Vector2D &t_vector)
     { return Vector2D{x - t_vector.x, y - t_vector.y}; }
 
-    Vector2D add(double t_x, double t_y)
-    { return Vector2D{x + t_x, y + t_y}; }
-
-    Vector2D sub(double t_x, double t_y)
-    { return Vector2D{x - t_x, y - t_y}; }
-
     // Division & Multiplication
-    Vector2D div(double value)
-    { return Vector2D{x / value, y / value}; }
+    Vector2D operator * (const Vector2D &t_vector)
+    { return Vector2D{x * t_vector.x, y * t_vector.y}; }
 
-    Vector2D mult(double value)
+    Vector2D operator * (double value)
     { return Vector2D{x * value, y * value}; }
 
-    Vector2D div(const Vector2D &t_vector)
+    Vector2D operator / (const Vector2D &t_vector)
     { return Vector2D{x / t_vector.x, y / t_vector.y}; }
 
-    Vector2D mult(const Vector2D &t_vector)
-    { return Vector2D{x * t_vector.x, y * t_vector.y}; }
+    Vector2D operator / (double value)
+    { return Vector2D{x / value, y / value}; }
 
     // Other
     Vector2D minimum(double value)
     {
         return Vector2D
         {
-            (fabs(x) < value ? x : value),
-            (fabs(y) < value ? y : value)
+            (fabs(x) < value ? x : value * (x/fabs(x))),
+            (fabs(y) < value ? y : value * (y/fabs(y)))
         };
     }
 
@@ -80,8 +86,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) < t_vector.x ? x : t_vector.x),
-            (fabs(y) < t_vector.y ? y : t_vector.y)
+            (fabs(x) < t_vector.x ? x : t_vector.x * (x/fabs(x))),
+            (fabs(y) < t_vector.y ? y : t_vector.y * (y/fabs(y)))
         };
     }
 
@@ -89,8 +95,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) > value ? x : value),
-            (fabs(y) > value ? y : value)
+            (fabs(x) > value ? x : value * (x/fabs(x))),
+            (fabs(y) > value ? y : value * (y/fabs(y)))
         };
     }
 
@@ -98,8 +104,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) > t_vector.x ? x : t_vector.x),
-            (fabs(y) > t_vector.y ? y : t_vector.y)
+            (fabs(x) > t_vector.x ? x : t_vector.x * (x/fabs(x))),
+            (fabs(y) > t_vector.y ? y : t_vector.y * (y/fabs(y)))
         };
     }
 
@@ -120,6 +126,9 @@ struct Vector2D
             (fabs(y) > value ? y : 0)
         };
     }
+
+    Vector2D abs()
+    { return Vector2D{fabs(x), fabs(y)}; }
 
     static Vector2D zero()
     { return Vector2D{0, 0}; }
