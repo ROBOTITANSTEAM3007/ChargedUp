@@ -135,6 +135,9 @@ class Robot : public frc::TimedRobot {
         void autonomus_place_cone()
         {
             // Place Cone In Auto
+            // For Now, The Robot Drives Forward.
+
+
             Limelight::put_data("ledMode", 3);
             Limelight::put_data("pipeline", 0);
 
@@ -145,28 +148,29 @@ class Robot : public frc::TimedRobot {
                 double target_skew = Limelight::get_data("ts", 0);
                 double vertical_offset = Limelight::get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
 
-                double vertical_offset_percentage = (Limelight::target_vertical_offset - vertical_offset) / 20.5;
-                double skew_offset_percentage = Limelight::convert_angle(target_skew) / 10;
+                double vertical_offset_percentage = -(Limelight::target_vertical_offset - vertical_offset) / 20.5;
+                // double skew_offset_percentage = Limelight::convert_angle(target_skew) / 10;
 
-                if (skew_offset_percentage < 0.1)
-                {
-                    vertical_offset_percentage = 0;
-                }
+                // if (skew_offset_percentage < 0.1)
+                // {
+                //     vertical_offset_percentage = 0;
+                // }
 
-                drive_train.speed = Vector3D{vertical_offset_percentage * Limelight::motion_pid.proportion, skew_offset_percentage * Limelight::motion_pid.proportion, 0}.minimum(Limelight::motion_limits);
+                drive_train.speed = Vector3D{vertical_offset_percentage * Limelight::motion_pid.proportion, 0, 0}.minimum(Limelight::motion_limits);
             }
             else
             {
-                Limelight::put_data("pipeline", 0); // Pipe line of one target
+                drive_train.speed = Vector3D{0.1, 0, 0}.minimum(Limelight::motion_limits);
+            //     Limelight::put_data("pipeline", 0); // Pipe line of one target
 
-                visible_target = Limelight::get_data("tv", 0);
+            //     visible_target = Limelight::get_data("tv", 0);
             
-                if (visible_target)
-                {
-                    Limelight::put_data("pipeline", 0); 
+            //     if (visible_target)
+            //     {
+            //         Limelight::put_data("pipeline", 0); 
                     
 
-                }
+            //     }
             }
 
             drive_train.update();
