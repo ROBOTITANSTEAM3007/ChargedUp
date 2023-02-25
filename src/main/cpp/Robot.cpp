@@ -11,8 +11,12 @@ using namespace std;
 PP posPls;
 
 void Robot::RobotInit() {
+
+    frc::CameraServer::StartAutomaticCapture();
+
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
+    auto_chooser.AddOption(auto_profile_whole_hog, auto_profile_whole_hog);
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
@@ -41,7 +45,10 @@ void Robot::RobotInit() {
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-void Robot::RobotPeriodic() {}
+void Robot::RobotPeriodic() {
+    // cs::CvSink cvSink = frc::CameraServer::GetVideo();
+    // cs::CvSource outputStream = frc::CameraServer::PutVideo("Front", 480, 480);
+}
 
 /**
  * This autonomous (along with the chooser code above) shows how to select
@@ -62,16 +69,19 @@ void Robot::AutonomousInit() {
         
     } else {
         // Default Auto goes here
+        
   }
 }
 
 void Robot::AutonomousPeriodic() {
-    autonomus_place_cone();
-
-    if (selected_auto == auto_profile_testing) {
+    if (selected_auto == auto_profile_whole_hog) {
+        drive_train.speed = Vector3D{0.8, 0, 0}.minimum(Limelight::motion_limits);
+    }
+    else if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
     } else {
         // Default Auto goes here
+        autonomus_place_cone();
     }
 }
 
@@ -103,9 +113,9 @@ void Robot::TeleopPeriodic() {
     drive_train.speed = 
     Vector3D
         {
-        -to_sigmoidal(drive_joystick.get_y(0.15, 1.0), 5), 
-        to_sigmoidal(drive_joystick.get_x(0.15, 1.0), 5), 
-        drive_joystick.get_twist(0.5, 0.3)
+        -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5), 
+        to_sigmoidal(drive_joystick.get_x(0.2, 1.0), 5), 
+        to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
         };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0.15, 1.0), 5) << endl;
@@ -173,7 +183,7 @@ void Robot::TeleopPeriodic() {
     // Arm Rotation
     if (lower_arm_button.is_active())
     {
-        double joystick_value = -arm_joystick.get_y(0.15, 1);
+        double joystick_value = arm_joystick.get_y(0.15, 1);
 
         if ((extension_switch_1.is_active() || extension_switch_2.is_active()) && (-joystick_value) < 0)
         {
@@ -204,11 +214,11 @@ void Robot::TeleopPeriodic() {
 
     // extension_switch_1.
 
-    frc::SmartDashboard::PutNumber("Encoder", (double)encoder.GetPositionOffset());
+    frc::SmartDashboard::PutNumber("Encoder", (double)encoder.Get());
     frc::SmartDashboard::PutNumber("Extension Switch 1", extension_switch_1.is_active());
     frc::SmartDashboard::PutNumber("Extension Switch 2", extension_switch_2.is_active());
     frc::SmartDashboard::PutNumber("Rotation Switch", grab_position_switch.is_active());
-    frc::SmartDashboard::PutNumber("Poten Value", get_potentiometer());
+    frc::SmartDashboard::PutNumber("Poten Value", get_potentiometer() / 0.0226022305);
 
     
     posPls.PPP();
