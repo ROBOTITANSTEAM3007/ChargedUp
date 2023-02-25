@@ -114,8 +114,8 @@ void Robot::TeleopPeriodic() {
     drive_train.speed = 
     Vector2D
     {
-    -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5),
-    to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
+        -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5),
+        to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0.15, 1.0), 5) << endl;
@@ -130,31 +130,18 @@ void Robot::TeleopPeriodic() {
     // Toggle Limelight LED
     if (button_2.is_active())
     {  
-        std::cout << "Button 2" << std::endl;
+        std::cout << "Toggle LED" << std::endl;
 
-        if (Limelight::get_data("ledMode", 1) == 1)
-        {
-            Limelight::put_data("ledMode", 3);
-        }
-        else
-        {
-            Limelight::put_data("ledMode", 1);
-        }
+        Limelight::toggle_led();
     }
 
-    // if (button_6.is_active()) {
-        
-    //     cout << "Button 6 Gyro Reset" << endl;
+    // Toggle Camera Mode
+    if (button_3.is_active())
+    {
+        cout << "Toggle Camera Mode" << endl;
 
-    //     Gyro::imu.Reset();
-    // }
-
-    // if (button_3.is_active())
-    // {
-    //     cout << "Button 3 Velocity Reset" << endl;
-
-    //     Gyro::velocity = Vector3D::zero();
-    // }
+        Limelight::toggle_camera();
+    }
 
 
     // Manual Arm Control
