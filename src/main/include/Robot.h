@@ -73,12 +73,13 @@ class Robot : public frc::TimedRobot {
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
-// ARM
+        // ARM
+        Arm arm;
         // Arm robot_arm;
 
         short
-        upper_arm_motor_ID { 5 },
-        lower_arm_motor_ID { 6 },
+       // upper_arm_motor_ID { 5 },
+        //lower_arm_motor_ID { 6 },
 
         hand_solenoid_channel { 0 },
         pole_solenoid_channel { 4 },
@@ -89,17 +90,19 @@ class Robot : public frc::TimedRobot {
         
         extension_potentiometer_port { 0 };
 
-        rev::CANSparkMax
-        upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
-        lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushed};
+        short extSens = 1;
+        short rotSens = 1;
+
+        //rev::CANSparkMax
+        //upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
+        //lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushed};
 
         frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
         frc::Solenoid pole_solenoid{frc::PneumaticsModuleType::CTREPCM, pole_solenoid_channel};
 
-        frc::DutyCycleEncoder encoder{shoulder_encoder_port};
+        //frc::DutyCycleEncoder encoder{shoulder_encoder_port};
 
-        // frc::AnalogInput extension_potentiometer_analog{extension_potentiometer_port}; //0V to 5V
-        frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; // 0 to 1
+        
 
         // Switches
         Switch grab_position_switch{0, ALL};// DIO 0 & 1 are rotaion arm limit switches
@@ -108,66 +111,13 @@ class Robot : public frc::TimedRobot {
         Switch extension_switch_1{extension_switch_1_port, ALL};// DIO 2 & 3 are extension arm limit switches
         Switch extension_switch_2{extension_switch_2_port, ALL};
 
-        double previous_potentiometer_value = 0;
-
-        double get_potentiometer()
-        {
-            double current_potentiometer_value = extension_potentiometer.Get();
-
-            if (current_potentiometer_value < 0)
-            { return previous_potentiometer_value; }
-            else
-            { previous_potentiometer_value = current_potentiometer_value; }
-
-            return current_potentiometer_value;
-        }
-
-        void autonomus_place_cone()
-        {
-            // Place Cone In Auto
-
-            Limelight::put_data("pipeline", 0);
-
-            double visible_target = Limelight::get_data("tv", 0);
-
-            if (visible_target)
-            {
-                double target_skew = Limelight::get_data("ts", 0);
-                double vertical_offset = Limelight::get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
-
-                double vertical_offset_percentage = (Limelight::target_vertical_offset - vertical_offset) / 20.5;
-                double skew_offset_percentage = Limelight::convert_angle(target_skew) / 10;
-
-                if (skew_offset_percentage < 0.1)
-                {
-                    vertical_offset_percentage = 0;
-                }
-
-                drive_train.speed = Vector3D{vertical_offset_percentage * Limelight::motion_pid.proportion, skew_offset_percentage * Limelight::motion_pid.proportion, 0}.minimum(Limelight::motion_limits);
-            }
-            else
-            {
-                Limelight::put_data("pipeline", 0); // Pipe line of one target
-
-                visible_target = Limelight::get_data("tv", 0);
-            
-                if (visible_target)
-                {
-                    Limelight::put_data("pipeline", 0); 
-                    
-
-                }
-            }
-
-            drive_train.update();
-        }
-
-// End Of ARM
-
         // STICKS
         // Drive Stick
         Joystick drive_joystick{0};
         Joystick arm_joystick{1};
+
+
+        //Arm
 
         // Button 
 

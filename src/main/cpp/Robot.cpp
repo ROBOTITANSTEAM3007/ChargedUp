@@ -143,18 +143,12 @@ void Robot::TeleopPeriodic() {
     {
         double joystick_value = -arm_joystick.get_y(0.15, 1);
 
-        if (!grab_position_switch.is_active() && joystick_value > 0)
-        {
-            upper_arm_motor.Set(0);
-        }
-        else
-        {
-            upper_arm_motor.Set(joystick_value);
-        }
+        arm.extendSet(joystick_value);
+        
     } 
     else
     {
-        upper_arm_motor.Set(0);
+        arm.extendSet(0);
     }
 
 
@@ -162,18 +156,12 @@ void Robot::TeleopPeriodic() {
     {
         double joystick_value = arm_joystick.get_y(0.15, 1);
 
-        if (!extension_switch_1.is_active() || !extension_switch_2.is_active() && (-joystick_value) < 0)
-        {
-            lower_arm_motor.Set(0);
-        }
-        else
-        {
-            lower_arm_motor.Set(joystick_value);
-        }
+        arm.rotSet(joystick_value);
+        
     }
     else
     {
-        lower_arm_motor.Set(0);
+        arm.rotSet(0);
     }
 
 
@@ -188,12 +176,14 @@ void Robot::TeleopPeriodic() {
         pole_solenoid.Toggle();
     }
 
+    arm.periodic();
 
 
-    frc::SmartDashboard::PutNumber("Encoder", (double)encoder.GetAbsolutePosition());
+
+    frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
     frc::SmartDashboard::PutNumber("Extension Switch 1", extension_switch_1.is_active());
     frc::SmartDashboard::PutNumber("Extension Switch 2", extension_switch_2.is_active());
-    frc::SmartDashboard::PutNumber("Poten Value", get_potentiometer());
+    frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
 
     
     posPls.PPP();
