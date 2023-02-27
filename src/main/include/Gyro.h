@@ -22,20 +22,6 @@ private:
     deadzone_value_velocity {0.02},
     deadzone_value_acceleration {0.001};
 public:
-    // FILTER
-/*     static inline auto
-        acceleration_filter_x = frc::LinearFilter<double>::MovingAverage(10),
-        acceleration_filter_y = frc::LinearFilter<double>::MovingAverage(10),
-        acceleration_filter_z = frc::LinearFilter<double>::MovingAverage(10); */
-
-    static double 
-    filtered_acceleration_x,
-    filtered_acceleration_y,
-    filtered_acceleration_z;
-
-
-    // frc::LinearFilter<double> filter = frc::LinearFilter<double>::MovingAverage(5);
-
     // IMU
     static inline frc::ADIS16470_IMU imu{};
     // NOTE: I think the IMU measures acceleration in 'g' (g-force)

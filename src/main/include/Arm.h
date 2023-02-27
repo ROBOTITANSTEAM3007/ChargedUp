@@ -1,4 +1,4 @@
-// #pragma once
+#pragma once
 
 // // ARM LAYOUT
 // // Hand Motor
@@ -12,14 +12,14 @@
 #include <frc/Solenoid.h>
 #include <frc/Encoder.h>
 #include <frc/DutyCycleEncoder.h>
-#include <frc/AnalogInput.h>
+#include <frc/AnalogPotentiometer.h>
 #include <fstream>
-
+#include <frc/Joystick.h>
+#include <iostream>
 #include <rev/CANSparkMax.h>
 
 
 #include "Vector2D.h"
-#include "Robot.h"
 
 // Height limit is 78 inches
 #define UPPER_ARM_LENGTH 15.6 // inches
@@ -37,25 +37,34 @@
 //        35.3in is the maximum extension of the arm from 23.7in.
 class Arm {
     private:
+        int extension_potentiometer_port = 0;
 
-        frc::AnalogInput analogExt{0};
-
+        frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; //0V to 5V
         std::fstream fs;
-
 
         //motors
         short
         upper_arm_motor_ID { 5 },
-        lower_left_arm_motor_ID { 6 },
-        lower_right_arm_motor_ID { 7 },
+        lower_arm_motor_ID { 6 },
+
         //pneumatics
-         hand_solenoid_channel { 0 },
+        //hand_solenoid_channel { 0 },
+
         //encoders
-        shoulder_encoder_channel { 0 };
+        shoulder_encoder_channel { 4 };
+
+        float ext[10];
+
+        double avrgExtension;
+
+
+
+
+        short iterations = 0;
 
         double angle_offset;
 
-        float maxArmLength = 54.4;
+        double maxArmLength = 54.4;
 
         float calibPoint1 = 0, calibPoint2 = 0;
 
@@ -65,20 +74,21 @@ class Arm {
 
         float extension_offset;
 
-        frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
+        //frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
 
         frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
 
     public:
-        double 
-        target_extension{0}, // 0 - 35.3 inches
-        target_angle{0};
+
+        bool manual;
+
+        double target_extension{0}; // 0 - 35.3 inches
+        double target_angle{0};
 
         //declarations
         rev::CANSparkMax
         upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
-        lower_left_arm_motor{lower_left_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}, // NOTE!: left motor follows right motor!
-        lower_right_arm_motor{lower_right_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}; // Right motor leads.
+        lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
         void reset_encoder()
         { encoder.Reset();}
@@ -88,15 +98,19 @@ class Arm {
         double rotation()
         { return encoder.GetAbsolutePosition(); } // Degrees
         
-        double extension()
-        { return extensionLength;}
+        double extension();
 
         double distance()
         { return sqrt(pow(/*arm extension*/1, 2) * pow(UPPER_ARM_LENGTH, 2)); }
 
         void calibrate(frc::Joystick *stick); //Linear regression from arm at shortest and longest extension
+ 
+        void extendSet(float x);
+
+        void rotSet(float x);
+
+        void periodic();
 
         void cone_auto_place_high();
 
-        void periodic();
 };  

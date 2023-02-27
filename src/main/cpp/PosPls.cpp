@@ -22,7 +22,7 @@ void PP::PPP() {
     this->Jerk.y = ((this->Acceleration.y - this->lastAcceleration.y)/(this->delta_time/MICROSECOND_PER_SECOND));
     this->Jerk.z = ((this->Acceleration.z - this->lastAcceleration.z)/(this->delta_time/MICROSECOND_PER_SECOND));
 
-    std::cout << "Jerk = " << this->Jerk.x << " " << this->Jerk.y << " " << this->Jerk.z << std::endl;
+    // std::cout << "Jerk = " << this->Jerk.x << " " << this->Jerk.y << " " << this->Jerk.z << std::endl;
 
     frc::SmartDashboard::PutNumber("Jerk-x", this->Jerk.x);
     frc::SmartDashboard::PutNumber("Jerk-y", this->Jerk.y);
@@ -36,7 +36,7 @@ void PP::PPP() {
     frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.y);
     frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.z);
 
-    std::cout << "Position = " << this->pos.x << ", " << this->pos.y << ", " << this->pos.z << std::endl;
+    // std::cout << "Position = " << this->pos.x << ", " << this->pos.y << ", " << this->pos.z << std::endl;
 
     frc::SmartDashboard::PutNumber("Position-x", this->pos.x);
     frc::SmartDashboard::PutNumber("Position-y", this->pos.y);
