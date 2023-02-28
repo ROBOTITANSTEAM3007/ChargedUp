@@ -186,7 +186,6 @@ void Robot::TeleopPeriodic() {
 
     arm.periodic();
 
-
     frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
     frc::SmartDashboard::PutNumber("Extension Switch 1", extension_switch_1.is_active());
     frc::SmartDashboard::PutNumber("Extension Switch 2", extension_switch_2.is_active());
