@@ -59,9 +59,9 @@ void Limelight::retroreflective_auto_align(Drive &drive)
         // std::cout << "Target Found!" << std::endl;
 
         percentage_horizontal_offset = horizontal_offset / 27;
-        percentage_vertical_offset = vertical_offset / 20.5;
+        percentage_vertical_offset = (vertical_offset - VERTICAL_DISTANCE_OFFSET) / 20.5;
 
-        if (percentage_horizontal_offset > 0.1)
+        if (fabs(percentage_horizontal_offset) > 0.1)
         {
             percentage_vertical_offset = 0;
         }

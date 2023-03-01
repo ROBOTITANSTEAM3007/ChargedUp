@@ -12,7 +12,10 @@ PP posPls;
 
 void Robot::RobotInit() {
 
-    frc::CameraServer::StartAutomaticCapture();
+    front_camera = frc::CameraServer::StartAutomaticCapture(1);
+    arm_camera = frc::CameraServer::StartAutomaticCapture(0);
+
+    camera_selection = nt::NetworkTableInstance::GetDefault().GetTable("")->GetEntry("CameraSelection");
 
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
@@ -20,10 +23,15 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
+    frc::SmartDashboard::PutNumber("Target Extension", 0.2);
+    frc::SmartDashboard::PutNumber("Target Rotation", 0.15);
+
     drive_train.front_right_motor->RestoreFactoryDefaults();
     drive_train.back_right_motor->RestoreFactoryDefaults();
     drive_train.front_left_motor->RestoreFactoryDefaults();
     drive_train.back_left_motor->RestoreFactoryDefaults();
+
+    drive_train.front_right_motor->SetInverted(true);
 
     // Motors are now following each other
     drive_train.back_left_motor->Follow(*drive_train.front_left_motor);
@@ -93,7 +101,7 @@ void Robot::TeleopPeriodic() {
     Vector2D
     {
         -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 10),
-        to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 10)
+        -to_sigmoidal(drive_joystick.get_twist(0.3, 1.0), 10)
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;
@@ -108,6 +116,21 @@ void Robot::TeleopPeriodic() {
         std::cout << "Toggle LED" << std::endl;
 
         Limelight::toggle_led();
+    }
+
+    // Switch Camera
+    if (button_6.is_active())
+    {
+        std::cout << "Change Camera" << std::endl;
+
+        if (camera_selection.GetString(arm_camera.GetName()) == arm_camera.GetName())
+        {
+            camera_selection.SetString(front_camera.GetName());
+        }
+        else
+        {
+            camera_selection.SetString(arm_camera.GetName());
+        }
     }
 
     // Toggle Camera Mode
@@ -161,6 +184,11 @@ void Robot::TeleopPeriodic() {
             arm.pole_solenoid.Toggle();
         }
     }
+
+    arm.manual = false;
+
+    arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
+    arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", 0.15);
 
     arm.periodic();
     drive_train.periodic();

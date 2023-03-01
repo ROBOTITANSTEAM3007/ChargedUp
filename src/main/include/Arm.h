@@ -18,7 +18,6 @@
 #include <iostream>
 #include <rev/CANSparkMax.h>
 
-
 #include "Vector2D.h"
 
 // Height limit is 78 inches
@@ -91,7 +90,7 @@ class Arm {
         //declarations
         rev::CANSparkMax
         upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
-        lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
+        lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushed};
 
         frc::Solenoid 
         hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel},
