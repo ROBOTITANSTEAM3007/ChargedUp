@@ -24,23 +24,23 @@ void PP::PPP() {
 
     // std::cout << "Jerk = " << this->Jerk.x << " " << this->Jerk.y << " " << this->Jerk.z << std::endl;
 
-    frc::SmartDashboard::PutNumber("Jerk-x", this->Jerk.x);
-    frc::SmartDashboard::PutNumber("Jerk-y", this->Jerk.y);
-    frc::SmartDashboard::PutNumber("Jerk-z", this->Jerk.z);
+    // frc::SmartDashboard::PutNumber("Jerk-x", this->Jerk.x);
+    // frc::SmartDashboard::PutNumber("Jerk-y", this->Jerk.y);
+    // frc::SmartDashboard::PutNumber("Jerk-z", this->Jerk.z);
 
     this->pos.x = this->pos.x + (std::pow(this->Jerk.x, 3)* (1/6));
     this->pos.y = this->pos.y + (std::pow(this->Jerk.y, 3)* (1/6));
     this->pos.z = this->pos.z + (std::pow(this->Jerk.z, 3)* (1/6));
 
-    frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.x);
-    frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.y);
-    frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.z);
+    // frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.x);
+    // frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.y);
+    // frc::SmartDashboard::PutNumber("Acceleration", this->Jerk.z);
 
     // std::cout << "Position = " << this->pos.x << ", " << this->pos.y << ", " << this->pos.z << std::endl;
 
-    frc::SmartDashboard::PutNumber("Position-x", this->pos.x);
-    frc::SmartDashboard::PutNumber("Position-y", this->pos.y);
-    frc::SmartDashboard::PutNumber("Position-z", this->pos.z);
+    // frc::SmartDashboard::PutNumber("Position-x", this->pos.x);
+    // frc::SmartDashboard::PutNumber("Position-y", this->pos.y);
+    // frc::SmartDashboard::PutNumber("Position-z", this->pos.z);
 
     this->lastAcceleration = this->Acceleration;
 
