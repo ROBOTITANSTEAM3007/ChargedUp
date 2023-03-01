@@ -30,6 +30,8 @@
 #define MAX_ARM_ROTATION 360 // degrees
 #define MIN_ARM_ROTATION 0 // degrees
 
+#define ARM_EXTENSION_CONSTANT 0.0226022305
+
 
 // NOTE!: 50in is the max length the arm can extend to stay inside the hight limit.
 //        23.7in is the arm's length when retracted.
@@ -37,28 +39,31 @@
 //        35.3in is the maximum extension of the arm from 23.7in.
 class Arm {
     private:
-        int extension_potentiometer_port = 0;
-
-        frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; //0V to 5V
         std::fstream fs;
 
-        //motors
+        // Sensor IDs
+        short 
+        extension_potentiometer_port { 0 },
+        shoulder_encoder_channel { 4 };
+
+        frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; //0V to 5V
+        frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
+
+        // Motor IDs
         short
         upper_arm_motor_ID { 5 },
-        lower_arm_motor_ID { 6 },
+        lower_arm_motor_ID { 6 };
 
-        //pneumatics
-        //hand_solenoid_channel { 0 },
+        // Solenoid IDs
+        short
+        hand_solenoid_channel { 0 },
+        pole_solenoid_channel { 4 };
 
-        //encoders
-        shoulder_encoder_channel { 4 };
+        double previous_potentiometer_value { 0 };
 
         float ext[10];
 
         double avrgExtension;
-
-
-
 
         short iterations = 0;
 
@@ -76,11 +81,9 @@ class Arm {
 
         //frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
 
-        frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
-
     public:
 
-        bool manual;
+        bool manual {true};
 
         double target_extension{0}; // 0 - 35.3 inches
         double target_angle{0};
@@ -90,24 +93,30 @@ class Arm {
         upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
         lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless};
 
-        void reset_encoder()
-        { encoder.Reset();}
+        frc::Solenoid 
+        hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel},
+        pole_solenoid{frc::PneumaticsModuleType::CTREPCM, pole_solenoid_channel};
 
         Arm();
+
+        void reset_encoder()
+        { encoder.Reset();}
 
         double rotation()
         { return encoder.GetAbsolutePosition(); } // Degrees
         
         double extension();
 
+        double get_potentiometer_value();
+
         double distance()
         { return sqrt(pow(/*arm extension*/1, 2) * pow(UPPER_ARM_LENGTH, 2)); }
 
         void calibrate(frc::Joystick *stick); //Linear regression from arm at shortest and longest extension
  
-        void extendSet(float x);
+        void set_direct_extend(float x);
 
-        void rotSet(float x);
+        void set_direct_rotation(float x);
 
         void periodic();
 
