@@ -101,7 +101,7 @@ void Arm::periodic() {
         if (fabs(extension_offset) > 0.01)
         {
 
-            lower_arm_motor.Set(fmin(extension_offset, 1));
+            lower_arm_motor.Set(-fmin(extension_offset, 1));
 
             std::cout << "Correct Extension: " << extension() << std::endl;
 

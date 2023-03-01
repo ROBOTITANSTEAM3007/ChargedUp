@@ -73,6 +73,10 @@ class Robot : public frc::TimedRobot {
         short compressor_ID {0};
         frc::Compressor compressor{compressor_ID, frc::PneumaticsModuleType::CTREPCM};
 
+        cs::UsbCamera front_camera;
+        cs::UsbCamera arm_camera;
+        nt::NetworkTableEntry camera_selection;
+
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
@@ -153,7 +157,7 @@ class Robot : public frc::TimedRobot {
 
         Button button_1{1, drive_joystick.object, ALL}; // Limelight Autoalign
         Button button_2{2, drive_joystick.object, PRESS}; // Toggle LED
-        Button button_6{6, drive_joystick.object, PRESS};
+        Button button_6{6, drive_joystick.object, PRESS}; // Switch Camera
         Button button_3{3, drive_joystick.object, PRESS}; // Toggle Camera Mode
 
         Button auto_arm_button{1, arm_joystick.object, PRESS};
