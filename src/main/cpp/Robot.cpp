@@ -12,7 +12,10 @@ PP posPls;
 
 void Robot::RobotInit() {
 
-    frc::CameraServer::StartAutomaticCapture();
+    front_camera = frc::CameraServer::StartAutomaticCapture(1);
+    arm_camera = frc::CameraServer::StartAutomaticCapture(0);
+
+    camera_selection = nt::NetworkTableInstance::GetDefault().GetTable("")->GetEntry("CameraSelection");
 
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
@@ -20,10 +23,15 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
+    frc::SmartDashboard::PutNumber("Target Extension", 0.2);
+    frc::SmartDashboard::PutNumber("Target Rotation", 0.15);
+
     drive_train.front_right_motor->RestoreFactoryDefaults();
     drive_train.back_right_motor->RestoreFactoryDefaults();
     drive_train.front_left_motor->RestoreFactoryDefaults();
     drive_train.back_left_motor->RestoreFactoryDefaults();
+
+    drive_train.front_right_motor->SetInverted(true);
 
     // Motors are now following each other
     drive_train.back_left_motor->Follow(*drive_train.front_left_motor);
@@ -46,10 +54,7 @@ void Robot::RobotInit() {
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-void Robot::RobotPeriodic() {
-    // cs::CvSink cvSink = frc::CameraServer::GetVideo();
-    // cs::CvSource outputStream = frc::CameraServer::PutVideo("Front", 480, 480);
-}
+void Robot::RobotPeriodic() {}
 
 /**
  * This autonomous (along with the chooser code above) shows how to select
@@ -84,33 +89,14 @@ void Robot::AutonomousPeriodic() {
         // Default Auto goes here
         autonomus_place_cone();
     }
+
+    arm.periodic();
+    drive_train.periodic();
 }
 
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    // Gyro::update();
-
-    // std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
-    // std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
-
-    // frc::SmartDashboard::PutNumber("AX", Gyro::acceleration.x);
-    // frc::SmartDashboard::PutNumber("AY", Gyro::acceleration.y);
-    // frc::SmartDashboard::PutNumber("AZ", Gyro::acceleration.z);
-
-    // frc::SmartDashboard::PutNumber("VX", Gyro::velocity.x);
-    // frc::SmartDashboard::PutNumber("VY", Gyro::velocity.y);
-    // frc::SmartDashboard::PutNumber("VZ", Gyro::velocity.z);
-
-    // frc::SmartDashboard::PutNumber("PX", Gyro::position.x);
-    // frc::SmartDashboard::PutNumber("PY", Gyro::position.y);
-    // frc::SmartDashboard::PutNumber("PZ", Gyro::position.z);
-
-    // Default: Twist, X, Y
-    // drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
-    // this commented drive is here to help me with merging
-    // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
-
     drive_train.speed = 
     /*Vector2D
     {
@@ -123,10 +109,7 @@ void Robot::TeleopPeriodic() {
         to_exponential(drive_joystick.get_twist(0.3, 0.5), 1)
     };
     
-    // cout << to_sigmoidal(drive_joystick.get_twist(0.15, 1.0), 5) << endl;
-
-    // drive_train.orientation = Gyro::imu.GetAngle();
-
+    // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;
 
     // Activate Limelight Auto Align
     if (button_1.is_active())
@@ -140,6 +123,21 @@ void Robot::TeleopPeriodic() {
         Limelight::toggle_led();
     }
 
+    // Switch Camera
+    if (button_6.is_active())
+    {
+        std::cout << "Change Camera" << std::endl;
+
+        if (camera_selection.GetString(arm_camera.GetName()) == arm_camera.GetName())
+        {
+            camera_selection.SetString(front_camera.GetName());
+        }
+        else
+        {
+            camera_selection.SetString(arm_camera.GetName());
+        }
+    }
+
     // Toggle Camera Mode
     if (button_3.is_active())
     {
@@ -151,57 +149,63 @@ void Robot::TeleopPeriodic() {
 
     // Manual Arm Control
 
-    // Arm Extension
-    if (upper_arm_button.is_active())
+    if (arm.manual)
     {
-        double joystick_value = arm_joystick.get_y(0.15, 1);
+        // Arm Extension
+        if (lower_arm_button.is_active())
+        {
+            double joystick_value = arm_joystick.get_y(0.15, 1);
 
-        arm.extendSet(joystick_value);
-        
-    } 
-    else
-    {
-        arm.extendSet(0);
+            arm.set_direct_extend(joystick_value);
+            
+        } 
+        else
+        {
+            arm.set_direct_extend(0);
+        }
+
+        // Arm Rotation
+        if (upper_arm_button.is_active())
+        {
+            double joystick_value = arm_joystick.get_y(0.15, 1);
+
+            arm.set_direct_rotation(joystick_value);
+            
+        }
+        else
+        {
+            arm.set_direct_rotation(0);
+        }
+
+        // Toggle Hand Grip
+        if (auto_arm_button.is_active())
+        {
+            arm.hand_solenoid.Toggle();
+        }
+
+        // Toggle Pole
+        if (pole_arm_button.is_active())
+        {
+            arm.pole_solenoid.Toggle();
+        }
     }
 
-    // Arm Rotation
-    if (lower_arm_button.is_active())
-    {
-        double joystick_value = arm_joystick.get_y(0.15, 1);
+    arm.manual = false;
 
-        arm.rotSet(joystick_value);
-        
-    }
-    else
-    {
-        arm.rotSet(0);
-    }
-
-    // Toggle Hand Grip
-    if (auto_arm_button.is_active())
-    {
-        hand_solenoid.Toggle();
-    }
-
-    // Toggle Pole
-    if (pole_arm_button.is_active())
-    {
-        pole_solenoid.Toggle();
-    }
+    arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
+    arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", 0.15);
 
     arm.periodic();
+    drive_train.periodic();
+
 
     frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
-    frc::SmartDashboard::PutNumber("Extension Switch 1", extension_switch_1.is_active());
-    frc::SmartDashboard::PutNumber("Extension Switch 2", extension_switch_2.is_active());
     frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
 
     
     posPls.PPP();
 
     // std::cout << (double)imu.GetAngle() << std::endl;
-
-    drive_train.periodic();
 }
 
 void Robot::DisabledInit() {}

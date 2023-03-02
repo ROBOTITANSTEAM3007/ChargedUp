@@ -71,57 +71,28 @@ class Robot : public frc::TimedRobot {
 
         // Compressor
         short compressor_ID {0};
-
         frc::Compressor compressor{compressor_ID, frc::PneumaticsModuleType::CTREPCM};
+
+        cs::UsbCamera front_camera;
+        cs::UsbCamera arm_camera;
+        nt::NetworkTableEntry camera_selection;
 
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
         // ARM
         Arm arm;
-        // Arm robot_arm;
-
-        short
-       // upper_arm_motor_ID { 5 },
-        //lower_arm_motor_ID { 6 },
-
-        hand_solenoid_channel { 0 },
-        pole_solenoid_channel { 4 },
-
-        extension_switch_1_port { 2 },
-        extension_switch_2_port { 3 },
-
-        shoulder_encoder_port { 4 },
         
-        extension_potentiometer_port { 0 };
-
         short extSens = 1;
         short rotSens = 1;
 
-        //rev::CANSparkMax
-        //upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
-        //lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushed};
-
-        frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
-        frc::Solenoid pole_solenoid{frc::PneumaticsModuleType::CTREPCM, pole_solenoid_channel};
-
-        //frc::DutyCycleEncoder encoder{shoulder_encoder_port};
-
-        
-
-        // Switches
-        Switch grab_position_switch{0, ALL};// DIO 0 & 1 are rotaion arm limit switches
-        // 0 is the grab postion
-
-        Switch extension_switch_1{extension_switch_1_port, ALL};// DIO 2 & 3 are extension arm limit switches
-        Switch extension_switch_2{extension_switch_2_port, ALL};
-
-        double to_sigmoidal(double input, double scale) // Anything larger than a scale of 5 is optimal
+        double to_sigmoidal(double input, double scale) // Anything larger than a scale of 10 is optimal
         {
             if (input == 0)
             { return 0; }
 
-            return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
+            // return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
+            return 1 / (1 + exp(-scale * (fabs(input) - 0.5))) * (fabs(input) / input);
         }
         //
         double to_exponential(double input, double scale) {
@@ -130,20 +101,6 @@ class Robot : public frc::TimedRobot {
             }
             return pow(M_E, (input * 5.42)-5.42);
         }
-
-/*         double previous_potentiometer_value = 0;
-
-        double get_potentiometer()
-        {
-            double current_potentiometer_value = extension_potentiometer.Get();
-
-            if (current_potentiometer_value < 0)
-            { return previous_potentiometer_value; }
-            else
-            { previous_potentiometer_value = current_potentiometer_value; }
-
-            return current_potentiometer_value;
-        } */
 
         void autonomus_place_cone()
         {
@@ -186,7 +143,7 @@ class Robot : public frc::TimedRobot {
             //     }
             // }
 
-            drive_train.periodic();
+            // drive_train.periodic();
         }
 
 // End Of ARM
@@ -207,7 +164,7 @@ class Robot : public frc::TimedRobot {
 
         Button button_1{1, drive_joystick.object, ALL}; // Limelight Autoalign
         Button button_2{2, drive_joystick.object, PRESS}; // Toggle LED
-        Button button_6{6, drive_joystick.object, PRESS};
+        Button button_6{6, drive_joystick.object, PRESS}; // Switch Camera
         Button button_3{3, drive_joystick.object, PRESS}; // Toggle Camera Mode
 
         Button auto_arm_button{1, arm_joystick.object, PRESS};
