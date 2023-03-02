@@ -112,10 +112,15 @@ void Robot::TeleopPeriodic() {
     // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
 
     drive_train.speed = 
-    Vector2D
+    /*Vector2D
     {
         -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5),
         to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
+    };*/
+    Vector2D
+    {
+        -to_exponential(drive_joystick.get_y(0.2, 1.0), 1),
+        to_exponential(drive_joystick.get_twist(0.3, 0.5), 1)
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0.15, 1.0), 5) << endl;

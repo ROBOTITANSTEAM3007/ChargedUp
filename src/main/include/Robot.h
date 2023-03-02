@@ -123,6 +123,13 @@ class Robot : public frc::TimedRobot {
 
             return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
         }
+        //
+        double to_exponential(double input, double scale) {
+            if (input == 0) {
+                return 0;
+            }
+            return pow(M_E, (input * 5.42)-5.42);
+        }
 
 /*         double previous_potentiometer_value = 0;
 
