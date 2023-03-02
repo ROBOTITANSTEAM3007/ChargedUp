@@ -105,8 +105,8 @@ void Robot::TeleopPeriodic() {
     };*/
     Vector2D
     {
-        -to_exponential(drive_joystick.get_y(0.2, 1.0), 1),
-        to_exponential(drive_joystick.get_twist(0.3, 0.5), 1)
+        -to_exponential(drive_joystick.get_y(0.2, 1.0)),
+        to_exponential(drive_joystick.get_twist(0.3, 0.5))
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;

@@ -95,11 +95,14 @@ class Robot : public frc::TimedRobot {
             return 1 / (1 + exp(-scale * (fabs(input) - 0.5))) * (fabs(input) / input);
         }
         //
-        double to_exponential(double input, double scale) {
+        double to_exponential(double input) {
             if (input == 0) {
                 return 0;
             }
-            return pow(M_E, (input * 5.42)-5.42);
+            if (input > 0) 
+                return pow(M_E, (input * 5.42)-5.42);
+            if (input < 0)
+                return pow(M_E, (-input * 5.42)-5.42);
         }
 
         void autonomus_place_cone()
