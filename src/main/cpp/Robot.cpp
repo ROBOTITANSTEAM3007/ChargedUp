@@ -73,6 +73,18 @@ void Robot::AutonomousInit() {
 
     if (selected_auto == auto_profile_testing) {
         
+    } else if (selected_auto == cone_high) {
+        arm.cone_auto_place_high();
+
+    } else if (selected_auto == cone_mid) {
+        arm.cone_auto_place_mid();
+
+    } else if (selected_auto == cube_high) {
+        arm.cube_auto_place_high();
+
+    } else if (selected_auto == cube_high) {
+        arm.cube_auto_place_mid();
+
     } else {
         // Default Auto goes here
         
@@ -85,7 +97,8 @@ void Robot::AutonomousPeriodic() {
     }
     else if (selected_auto == auto_profile_testing) {
         // Custom Auto goes here
-    } else {
+    } 
+    else {
         // Default Auto goes here
         autonomus_place_cone();
     }

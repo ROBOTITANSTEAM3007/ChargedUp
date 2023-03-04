@@ -61,7 +61,7 @@ Arm::Arm() {
 
 void Arm::periodic() {
     // Get the average of the past 10 potentiometer reads
-    ext[iterations] = get_potentiometer_value();
+    ext[iterations] = get_potentiometer_value() - POTENTIOMETER_OFFSET;
     
     if(iterations < 9) {
     
@@ -114,3 +114,27 @@ void Arm::set_direct_rotation(float x)
 
 void Arm::set_direct_extend(float x)
 { upper_arm_motor.Set(x); }
+
+void Arm::cone_auto_place_high() {
+    this->manual = false;
+    this->target_angle = 0;//Change ME!!!
+    this->target_extension = 0;
+}
+void Arm::cone_auto_place_mid() {
+    this->manual = false;
+    this->target_angle = 0;//Change ME!!!
+    this->target_extension = 0;
+}
+
+void Arm::cube_auto_place_high() {
+    this->manual = false;
+    this->target_angle = 0;//Change ME!!!
+    this->target_extension = 0;
+}
+
+void Arm::cube_auto_place_mid() {
+    this->manual = false;
+    this->target_angle = 0;//Change ME!!!
+    this->target_extension = 0;
+}
+

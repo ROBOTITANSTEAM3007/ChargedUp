@@ -6,7 +6,6 @@
 // // Shoulder Motor
 
 // // Shoulder Encoder
-// // 
 
 
 #include <frc/Solenoid.h>
@@ -25,6 +24,8 @@
 
 #define MAX_ARM_EXTENSION 35.3 // inches
 #define MIN_ARM_EXTENSION 0 // inches
+
+#define POTENTIOMETER_OFFSET 0.15
 
 #define MAX_ARM_ROTATION 360 // degrees
 #define MIN_ARM_ROTATION 0 // degrees
@@ -52,6 +53,7 @@ class Arm {
         short
         upper_arm_motor_ID { 5 },
         lower_arm_motor_ID { 6 };
+// // 
 
         // Solenoid IDs
         short
@@ -118,6 +120,12 @@ class Arm {
         void set_direct_rotation(float x);
 
         void periodic();
+
+        void cone_auto_place_mid();
+
+        void cube_auto_place_mid();
+
+        void cube_auto_place_high();
 
         void cone_auto_place_high();
 
