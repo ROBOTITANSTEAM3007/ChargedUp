@@ -83,8 +83,8 @@ class Robot : public frc::TimedRobot {
         // ARM
         Arm arm;
         
-        short extSens = 1;
-        short rotSens = 1;
+        // short extSens = 1;
+        // short rotSens = 1;
 
         double to_sigmoidal(double input, double scale) // Anything larger than a scale of 10 is optimal
         {
@@ -92,7 +92,7 @@ class Robot : public frc::TimedRobot {
             { return 0; }
 
             // return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
-            return 1 / (1 + exp(-scale * (fabs(input) - 0.5))) * (fabs(input) / input);
+            return 2 / (1 + exp(-scale * (fabs(input / 2) - 0.5))) * (fabs(input) / input);
         }
 
         void autonomus_place_cone()
@@ -165,6 +165,9 @@ class Robot : public frc::TimedRobot {
 
         Button upper_arm_button{3, arm_joystick.object, ALL};
         Button lower_arm_button{4, arm_joystick.object, ALL};
+
+        Button move_to_high_button{6, arm_joystick.object, PRESS};
+        Button setup_grab_button{5, arm_joystick.object, PRESS};
 
     private:
         frc::SendableChooser<std::string> auto_chooser;

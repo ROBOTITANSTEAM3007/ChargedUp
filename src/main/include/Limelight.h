@@ -23,8 +23,8 @@ private:
 
 public:
     // Motion Properties
-    static inline PID motion_pid{0.25, 0, 0};
-    static inline Vector2D motion_limits{0.25, 1};
+    static inline PID motion_pid{1, 0, 0};
+    static inline Vector2D motion_limits{1, 1};
     static inline double target_vertical_offset{0};
 
     // Limelight Networktable Values

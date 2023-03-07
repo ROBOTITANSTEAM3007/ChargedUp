@@ -114,7 +114,7 @@ void Robot::TeleopPeriodic() {
     Vector2D
     {
         -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 10),
-        -to_sigmoidal(drive_joystick.get_twist(0.3, 1.0), 10)
+        -to_sigmoidal(drive_joystick.get_twist(0.3, 0.8), 10)
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;
@@ -161,51 +161,51 @@ void Robot::TeleopPeriodic() {
     {
         // Arm Extension
         if (lower_arm_button.is_active())
-        {
-            double joystick_value = arm_joystick.get_y(0.15, 1);
-
-            arm.set_direct_extend(joystick_value);
-            
-        } 
+        { arm.set_direct_extend(arm_joystick.get_y(0.15, 1)); } 
         else
-        {
-            arm.set_direct_extend(0);
-        }
+        { arm.set_direct_extend(0); }
 
         // Arm Rotation
         if (upper_arm_button.is_active())
-        {
-            double joystick_value = arm_joystick.get_y(0.15, 1);
-
-            arm.set_direct_rotation(joystick_value);
-            
-        }
+        { arm.set_direct_rotation(arm_joystick.get_y(0.15, 1)); }
         else
-        {
-            arm.set_direct_rotation(0);
-        }
+        { arm.set_direct_rotation(0); }
 
         // Toggle Hand Grip
         if (auto_arm_button.is_active())
-        {
-            arm.hand_solenoid.Toggle();
-        }
+        { arm.hand_solenoid.Toggle(); }
 
         // Toggle Pole
         if (pole_arm_button.is_active())
-        {
-            arm.pole_solenoid.Toggle();
-        }
+        { arm.pole_solenoid.Toggle(); }
     }
 
-    arm.manual = false;
+    // arm.manual = false;
 
-    arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
-    arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", 0.15);
+    // Moves arm to position for high cone
+    if (move_to_high_button.is_active())
+    { 
+        cout << "Setup High Cone" << endl;
+
+        arm.move_to_high(); 
+    }
+
+    // Moves arm and extension to position for picking up
+    if (setup_grab_button.is_active())
+    { 
+        cout << "Setup Grab" << endl;
+
+        arm.move_to_grab();
+    }
+
+    // arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
+    // arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", POTENTIOMETER_OFFSET);
 
     arm.periodic();
     drive_train.periodic();
 
+    frc::SmartDashboard::PutNumber("Target Extension", arm.target_extension);
+    frc::SmartDashboard::PutNumber("Target Rotation", arm.target_angle);
 
     frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
     frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
