@@ -8,7 +8,7 @@ void Gyro::update()
   {
       // 1 Second = 1,000,000 Microseconds
       // 1 Second = 1,000 Milliseconds
-      double delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_tick - previous_tick).count();
+      // double delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_tick - previous_tick).count();
 
       // std::cout << delta_time << std::endl;
 

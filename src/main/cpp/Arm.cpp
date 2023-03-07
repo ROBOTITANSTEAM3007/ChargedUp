@@ -1,5 +1,16 @@
 #include "Arm.h"
 
+Arm::Arm() {
+    this->target_extension = 0;
+    this->target_angle = 0;
+    this->speed = Vector2D{0, 0};
+//     this->analogExt.SetAverageBits(8);
+//     this->fs.open("calib.bin", std::ios::in | std::ios::out | std::ios::app | std::ios::binary);
+//     if(!this->fs.is_open()) {
+//         this->fs.read((char*)(&extensionSlope), sizeof(extensionSlope));
+//     }
+};
+
 // Tries to auto calibrate arm motions
 void Arm::calibrate(frc::Joystick *stick) {
     if(stick->GetRawButtonPressed(4)) {
@@ -22,16 +33,14 @@ void Arm::calibrate(frc::Joystick *stick) {
     }
 }
 
-double Arm::get_potentiometer_value()
+double Arm::potentiometer_value()
 {
-    double current_potentiometer_value = extension_potentiometer.Get();
+    current_potentiometer_value = extension_potentiometer.Get();
 
     if (current_potentiometer_value < 0)
-    
     { return previous_potentiometer_value; }
     
     else
-
     { previous_potentiometer_value = current_potentiometer_value; }
 
     return current_potentiometer_value;
@@ -40,86 +49,76 @@ double Arm::get_potentiometer_value()
 double Arm::extension(){
     avrgExtension = 0;
 
-    for(int i = 0; i < 9; i++) {
-        avrgExtension = avrgExtension + ext[i];
-    }
+    for(int i = 0; i < 9; i++)
+    { avrgExtension += ext[i]; }
 
-    avrgExtension = avrgExtension / 10;
+    avrgExtension = avrgExtension / 10; // Average of the values
 
-    return((avrgExtension / ARM_EXTENSION_CONSTANT));
+    return((avrgExtension * ARM_EXTENSION_CONSTANT));
 }
 
-Arm::Arm() {
-    this->target_extension = 0;
-    this->target_angle = 0.2;
-//     this->analogExt.SetAverageBits(8);
-//     this->fs.open("calib.bin", std::ios::in | std::ios::out | std::ios::app | std::ios::binary);
-//     if(!this->fs.is_open()) {
-//         this->fs.read((char*)(&extensionSlope), sizeof(extensionSlope));
-//     }
-};
+double Arm::rotation() // Degrees
+{ return (encoder.GetAbsolutePosition() - ENCODER_OFFSET) * ARM_ROTATION_CONSTANT; }
+
+double Arm::distance() // From the shoulder point to the hand
+{ return sqrt(pow(extension(), 2) * pow(UPPER_ARM_LENGTH, 2)); }
+
+void Arm::update_average_extension(double input)
+{
+    // Get the average of the past 10 potentiometer reads
+    ext[iterations] = input;
+    
+    if(iterations < 9)
+    { iterations++; }
+    else
+    { iterations = 0; }
+}
 
 void Arm::periodic() {
-    // Get the average of the past 10 potentiometer reads
-    ext[iterations] = get_potentiometer_value() - POTENTIOMETER_OFFSET;
-    
-    if(iterations < 9) {
-    
-        iterations++;
-    
-    } else {
-    
-        iterations = 0;
-    
-    }
+    update_average_extension(potentiometer_value() - POTENTIOMETER_OFFSET);
 
     // Run Manual
     if(!manual){
+        rotation_offset = target_angle - rotation();
+        extension_offset = target_extension - extension();
+        safe_extension_offset = SAFE_TARGET_EXTENSION - extension();
         
-        if (target_angle < 0.2)
-        {
-            target_angle = 0.2;
-        }
-
-        if(target_extension < 0)
-        {
-            target_extension = 0;
-        }
-
-        angle_offset = fmax(fmin(target_angle, MAX_ARM_ROTATION), MIN_ARM_ROTATION) - rotation();
-        
-
-        if (fabs(angle_offset) > 0.01)
-        {
-            upper_arm_motor.Set(-fmin(angle_offset, 1));
-            std::cout << "Correct Rotation: " << rotation() << std::endl;
-        }
-
-        extension_offset = (fmax(fmin(target_extension, MAX_ARM_EXTENSION), MIN_ARM_EXTENSION) - extension());
+        // Rotates Arm.
+        if (fabs(rotation_offset) > MOVMENT_SUCCESS_ZONE)
+        { this->speed += Vector2D{-fmax(fmin(rotation_offset * 2, 1), -1), 0}; }
+        else
+        { std::cout << "Correct Rotation: " << rotation() << std::endl; }
 
 
-        if (fabs(extension_offset) > 0.01)
-        {
 
-            lower_arm_motor.Set(-fmin(extension_offset, 1));
+        // Extends and Retracts Arm.
+        if (fabs(extension_offset) > MOVMENT_SUCCESS_ZONE)
+        { this->speed += Vector2D{0, -fmax(fmin(extension_offset, 1), -1)}; }
+        else
+        { std::cout << "Correct Extension: " << extension() << std::endl; }
 
-            std::cout << "Correct Extension: " << extension() << std::endl;
-
-        }
+        // Turns manual off when in correct locations.
+        if (fabs(rotation_offset) <= MOVMENT_SUCCESS_ZONE && fabs(extension_offset) <= MOVMENT_SUCCESS_ZONE)
+        { this->manual = true; }
     }
+
+    lower_arm_motor.Set(speed.y);
+    upper_arm_motor.Set(speed.x);
 };
 
-void Arm::set_direct_rotation(float x)
-{ lower_arm_motor.Set(x); }
+void Arm::set_direct_rotation(float input)
+{ this->speed = Vector2D{input, speed.y}; }
 
-void Arm::set_direct_extend(float x)
-{ upper_arm_motor.Set(x); }
+void Arm::set_direct_extend(float input)
+{ this->speed = Vector2D{speed.x, input}; }
+
 
 void Arm::cone_auto_place_high() {
     this->manual = false;
     this->target_angle = 0;//Change ME!!!
     this->target_extension = 0;
 }
+
 void Arm::cone_auto_place_mid() {
     this->manual = false;
     this->target_angle = 0;//Change ME!!!
@@ -138,3 +137,20 @@ void Arm::cube_auto_place_mid() {
     this->target_extension = 0;
 }
 
+
+void Arm::move_to_high()
+{
+    this->manual = false;
+
+    this->target_angle = 165;
+    this->target_extension = 28.0;
+}
+
+void Arm::move_to_grab()
+{
+    this->manual = false;
+
+    this->target_angle = 0;
+    this->target_extension = 5.0;
+    this->hand_solenoid.Set(true);
+}
