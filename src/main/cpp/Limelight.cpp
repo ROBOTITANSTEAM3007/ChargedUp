@@ -54,19 +54,21 @@ void Limelight::retroreflective_auto_align(Drive &drive)
     horizontal_offset = get_data("tx", 0); // -27 degrees to 27 degrees (54 degrees)
     vertical_offset = get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
 
+    vertical_offset += VERTICAL_DISTANCE_OFFSET;
+
     if (visible_target == 1) // If target is visible
     {  
-        // std::cout << "Target Found!" << std::endl;
+        std::cout << "Target Found!" << std::endl;
 
         percentage_horizontal_offset = horizontal_offset / 27;
         percentage_vertical_offset = 0.4;
 
-        if (fabs(percentage_horizontal_offset) > 0.01)
-        {
-            percentage_vertical_offset = 0;
-        }
+        // if (fabs(horizontal_offset) > 0.1)
+        // {
+        //     vertical_offset = 0;
+        // }
 
-        drive.speed += Vector2D{-percentage_vertical_offset, -percentage_horizontal_offset * motion_pid.proportion};
+        drive.speed += Vector2D{0, motion_PID_controller.Calculate(percentage_horizontal_offset, 0)};
     }
     else
     {

@@ -5,6 +5,8 @@
 
 #include <rev/CANSparkMax.h>
 
+#include <frc/controller/PIDController.h>
+
 #include "Vector2D.h"
 
 // 6 in Diameter Wheels
@@ -51,5 +53,8 @@ public:
 
     // UPDATES ROBOT DRIVE
     void periodic()
-    { controller->ArcadeDrive(fmax(fmin(speed.x, 1), -1), fmax(fmin(speed.y, 1), -1)); }
+    { 
+        // speed = speed.maximum(-1).minimum(1);
+        controller->ArcadeDrive(std::clamp(speed.x, -1.00, 1.00), std::clamp(speed.y, -1.00, 1.00));
+    }
 };

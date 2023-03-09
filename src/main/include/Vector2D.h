@@ -1,5 +1,7 @@
 #pragma once
 
+#define M_PI 3.14159265358979323846
+
 struct Vector2D
 {
     double x, y;
@@ -77,8 +79,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) < value ? x : value * (x/fabs(x))),
-            (fabs(y) < value ? y : value * (y/fabs(y)))
+            ( x < value ? x : value),
+            ( y < value ? y : value)
         };
     }
 
@@ -86,8 +88,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) < t_vector.x ? x : t_vector.x * (x/fabs(x))),
-            (fabs(y) < t_vector.y ? y : t_vector.y * (y/fabs(y)))
+            (x < t_vector.x ? x : t_vector.x),
+            (y < t_vector.y ? y : t_vector.y)
         };
     }
 
@@ -95,8 +97,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) > value ? x : value * (x/fabs(x))),
-            (fabs(y) > value ? y : value * (y/fabs(y)))
+            ( x > value ? x : value),
+            ( y > value ? y : value)
         };
     }
 
@@ -104,26 +106,8 @@ struct Vector2D
     {
         return Vector2D
         {
-            (fabs(x) > t_vector.x ? x : t_vector.x * (x/fabs(x))),
-            (fabs(y) > t_vector.y ? y : t_vector.y * (y/fabs(y)))
-        };
-    }
-
-    Vector2D deadzone(const Vector2D &t_vector)
-    {
-        return Vector2D
-        {
-            (fabs(x) > t_vector.x ? x : 0),
-            (fabs(y) > t_vector.y ? y : 0)
-        };
-    }
-
-    Vector2D deadzone(double value)
-    {
-        return Vector2D
-        {
-            (fabs(x) > value ? x : 0),
-            (fabs(y) > value ? y : 0)
+            ( x > t_vector.x ? x : t_vector.x),
+            ( y > t_vector.y ? y : t_vector.y)
         };
     }
 
