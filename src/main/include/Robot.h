@@ -5,8 +5,6 @@
 
 #pragma once
 
-#define M_PI 3.14159265358979323846
-
 #include <string>
 #include <chrono>
 
@@ -28,6 +26,10 @@
 #include <frc/AnalogInput.h>
 #include <frc/AnalogPotentiometer.h>
 #include <frc/TimedRobot.h>
+
+#include <frc/PowerDistribution.h>
+#include <hal/PowerDistribution.h>
+
 
 #include <iostream>
 
@@ -58,6 +60,8 @@ class Robot : public frc::TimedRobot {
         void SimulationInit() override;
         void SimulationPeriodic() override;
 
+        frc::PowerDistribution power_distribution_board{0, frc::PowerDistribution::ModuleType::kCTRE};
+
         // MOTORS
 
         // Right Side
@@ -73,15 +77,22 @@ class Robot : public frc::TimedRobot {
         short compressor_ID {0};
         frc::Compressor compressor{compressor_ID, frc::PneumaticsModuleType::CTREPCM};
 
-        cs::UsbCamera front_camera;
-        cs::UsbCamera arm_camera;
-        nt::NetworkTableEntry camera_selection;
+        // cs::UsbCamera front_camera;
+        // cs::UsbCamera arm_camera;
+
+        cs::VideoSource front_camera;
+        cs::VideoSource arm_camera;
+
+        cs::VideoSink server;
 
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
 
         // ARM
         Arm arm;
+
+        // GYRO
+        Gyro gyro;
         
         // short extSens = 1;
         // short rotSens = 1;
@@ -90,6 +101,7 @@ class Robot : public frc::TimedRobot {
         {
             if (input == 0)
             { return 0; }
+        
 
             // return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
             return 2 / (1 + exp(-scale * (fabs(input / 2) - 0.5))) * (fabs(input) / input);
@@ -159,6 +171,8 @@ class Robot : public frc::TimedRobot {
         Button button_2{2, drive_joystick.object, PRESS}; // Toggle LED
         Button button_6{6, drive_joystick.object, PRESS}; // Switch Camera
         Button button_3{3, drive_joystick.object, PRESS}; // Toggle Camera Mode
+
+        Button auto_level_button{5, drive_joystick.object, ALL}; // Autolevel
 
         Button auto_arm_button{1, arm_joystick.object, PRESS};
         Button pole_arm_button{2, arm_joystick.object, PRESS};
