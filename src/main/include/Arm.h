@@ -106,8 +106,8 @@ class Arm {
         float extensionLength; //measured in inches sadly.
 
     public:
-        PID rotation_PID{0.1, 0, 0};
-        PID extension_PID{0.1, 0, 0};
+        PID rotation_PID{0.02, 0, 0};
+        PID extension_PID{0.02, 0, 0};
 
         frc2::PIDController rotation_PID_controller{rotation_PID.proportion, rotation_PID.integral, rotation_PID.derivative};
         frc2::PIDController extension_PID_controller{extension_PID.proportion, extension_PID.integral, extension_PID.derivative};
