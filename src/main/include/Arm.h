@@ -33,11 +33,11 @@
 #define RETRACTED_LOWER_ARM_LENGTH 23.7 //inches
 
 // Robot Sensor Constants
-#define MAX_ARM_EXTENSION 35.3 // inches
+#define MAX_ARM_EXTENSION 29 // inches
 #define MIN_ARM_EXTENSION 0 // inches
 
-#define POTENTIOMETER_OFFSET 0.14 // 0 - 1
-#define ENCODER_OFFSET 0.17 // 0 - 1
+#define POTENTIOMETER_OFFSET 0 // 0 - 1
+#define ENCODER_OFFSET 0.15 // 0 - 1
 
 #define MAX_ARM_ROTATION 360 // degrees
 #define MIN_ARM_ROTATION 0 // degrees
@@ -45,7 +45,7 @@
 #define ARM_EXTENSION_CONSTANT 44.24342102 // Was 0.0226022305, inches
 #define ARM_ROTATION_CONSTANT 360.00 // degrees
 
-#define SAFE_TARGET_EXTENSION 26.3 // inches 
+#define SAFE_TARGET_EXTENSION 23.3 // inches 
 
 // Zones where gravity will impact the extension
 #define MIN_UNSAFE_EXTENSION_ZONE 45
@@ -66,6 +66,9 @@
 class Arm {
     private:
         std::fstream fs;
+
+        // Stages
+        bool finished_cone_placment {false};
 
         // Sensor IDs
         short 
@@ -107,7 +110,7 @@ class Arm {
 
     public:
         PID rotation_PID{0.02, 0, 0};
-        PID extension_PID{0.02, 0, 0};
+        PID extension_PID{0.3, 0, 0};
 
         frc2::PIDController rotation_PID_controller{rotation_PID.proportion, rotation_PID.integral, rotation_PID.derivative};
         frc2::PIDController extension_PID_controller{extension_PID.proportion, extension_PID.integral, extension_PID.derivative};
@@ -151,15 +154,17 @@ class Arm {
         void periodic();
 
 
-        void move_to_high();
+        void move_to_high_cone();
+        void move_to_mid_cone();
+
         void move_to_grab();
 
 
-        void cone_auto_place_mid();
+        void cone_auto_place_mid(Drive &);
 
-        void cube_auto_place_mid();
+        void cube_auto_place_mid(Drive &);
 
-        void cube_auto_place_high();
+        void cube_auto_place_high(Drive &);
 
         void cone_auto_place_high(Drive &);
 

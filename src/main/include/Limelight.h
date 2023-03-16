@@ -23,7 +23,7 @@ private:
 
 public:
     // Motion Properties
-    static inline PID motion_PID{0.5, 0.001, 0};
+    static inline PID motion_PID{0.6, 0.01, 0};
     static inline frc2::PIDController motion_PID_controller{motion_PID.proportion, motion_PID.integral, motion_PID.derivative};
     static inline Vector2D motion_limits{1, 1};
     static inline double target_vertical_offset{0};

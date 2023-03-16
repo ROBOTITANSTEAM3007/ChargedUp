@@ -17,6 +17,9 @@ void Robot::RobotInit() {
     front_camera = frc::CameraServer::StartAutomaticCapture("Front Camera", 1);
     arm_camera = frc::CameraServer::StartAutomaticCapture("Arm Camera", 0);
 
+    arm_camera.SetFPS(10);
+    front_camera.SetFPS(20);
+
     front_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
     arm_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
 
@@ -24,11 +27,23 @@ void Robot::RobotInit() {
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
     auto_chooser.AddOption(auto_profile_whole_hog, auto_profile_whole_hog);
+    auto_chooser.AddOption(cone_high, cone_high);
+    auto_chooser.AddOption(cone_mid, cone_mid);
+    auto_chooser.AddOption(cube_high, cube_high);
+    auto_chooser.AddOption(cube_mid, cube_high);
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
     frc::SmartDashboard::PutNumber("Target Extension", arm.target_extension);
     frc::SmartDashboard::PutNumber("Target Rotation", arm.target_angle);
+
+    frc::SmartDashboard::PutNumber("Extension P", arm.extension_PID.proportion);
+    frc::SmartDashboard::PutNumber("Extension I", arm.extension_PID.integral);
+    frc::SmartDashboard::PutNumber("Extension D", arm.extension_PID.derivative);
+
+    frc::SmartDashboard::PutNumber("Rotation P", arm.rotation_PID.proportion);
+    frc::SmartDashboard::PutNumber("Rotation I", arm.rotation_PID.integral);
+    frc::SmartDashboard::PutNumber("Rotation D", arm.rotation_PID.derivative);
 
     drive_train.front_right_motor->RestoreFactoryDefaults();
     drive_train.back_right_motor->RestoreFactoryDefaults();
@@ -47,7 +62,7 @@ void Robot::RobotInit() {
     gyro.imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
     gyro.imu.Calibrate();
 
-    gyro.imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kY);
+    gyro.imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kX);
 
 }
 
@@ -59,7 +74,10 @@ void Robot::RobotInit() {
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-void Robot::RobotPeriodic() {}
+void Robot::RobotPeriodic()
+{
+    frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.imu.GetAngle());
+}
 
 /**
  * This autonomous (along with the chooser code above) shows how to select
@@ -79,35 +97,53 @@ void Robot::AutonomousInit() {
     if (selected_auto == auto_profile_testing) {
         
     } else if (selected_auto == cone_high) {
-        // arm.cone_auto_place_high(drive_train);
+        arm.cone_auto_place_high(drive_train);
+    }
+    // } else if (selected_auto == cone_mid) {
+    //     arm.cone_auto_place_mid();
 
-    } else if (selected_auto == cone_mid) {
-        arm.cone_auto_place_mid();
+    // } else if (selected_auto == cube_high) {
+    //     arm.cube_auto_place_high();
 
-    } else if (selected_auto == cube_high) {
-        arm.cube_auto_place_high();
+    // } else if (selected_auto == cube_high) {
+    //     arm.cube_auto_place_mid();
 
-    } else if (selected_auto == cube_high) {
-        arm.cube_auto_place_mid();
-
-    } else {
-        // Default Auto goes here
-        
-  }
+    // } else {
+    //     // Default Auto goes here
+    // }
 }
 
 void Robot::AutonomousPeriodic() {
     if (selected_auto == auto_profile_whole_hog) {
         drive_train.speed = Vector2D{0.8, 0};
     }
-    else if (selected_auto == auto_profile_testing) {
-        // Custom Auto goes here
-    } 
-    else {
-        // Default Auto goes here
-        // autonomus_place_cone();
-        // arm.cone_auto_place_high(drive_train);
-    }
+
+    // if (selected_auto == auto_profile_testing) {
+        
+    // } else if (selected_auto == cone_high) {
+    //     arm.cone_auto_place_high(drive_train);
+
+    // } else if (selected_auto == cone_mid) {
+    //     arm.cone_auto_place_mid(drive_train);
+
+    // } else if (selected_auto == cube_high) {
+    //     arm.cube_auto_place_high(drive_train);
+
+    // } else if (selected_auto == cube_high) {
+    //     arm.cube_auto_place_mid(drive_train);
+
+    // } else {
+    //     // Default Auto goes here
+    // }
+
+    // else if (selected_auto == auto_profile_testing) {
+    //     // Custom Auto goes here
+    // } 
+    // else {
+    //     // Default Auto goes here
+    //     // autonomus_place_cone();
+    //     arm.cone_auto_place_high(drive_train);
+    // }
 
     arm.periodic();
     drive_train.periodic();
@@ -130,8 +166,11 @@ void Robot::TeleopPeriodic() {
     { Limelight::retroreflective_auto_align(drive_train); }
 
     // Tries to Auto Level on the charging station
-    // if (auto_level_button.is_active())
-    // { gyro.auto_level(drive_train); }
+    if (auto_level_button.is_active()) // 5
+    {
+        gyro.auto_level(drive_train);
+        // gyro.imu.get
+    }
 
     // Toggle Limelight LED
     if (button_2.is_active())
@@ -212,7 +251,7 @@ void Robot::TeleopPeriodic() {
     { 
         cout << "Setup High Cone" << endl;
 
-        arm.move_to_high(); 
+        arm.move_to_high_cone(); 
     }
 
     // Moves arm and extension to position for picking up
@@ -234,7 +273,6 @@ void Robot::TeleopPeriodic() {
 
     frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
     frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
-    frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.imu.GetAngle());
 
     
     posPls.PPP();

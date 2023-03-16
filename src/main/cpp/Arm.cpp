@@ -9,14 +9,6 @@ Arm::Arm() {
 //     if(!this->fs.is_open()) {
 //         this->fs.read((char*)(&extensionSlope), sizeof(extensionSlope));
 //     }
-
-    frc::SmartDashboard::PutNumber("Extension P", extension_PID.proportion);
-    frc::SmartDashboard::PutNumber("Extension I", extension_PID.integral);
-    frc::SmartDashboard::PutNumber("Extension D", extension_PID.derivative);
-
-    frc::SmartDashboard::PutNumber("Rotation P", rotation_PID.proportion);
-    frc::SmartDashboard::PutNumber("Rotation I", rotation_PID.integral);
-    frc::SmartDashboard::PutNumber("Rotation D", rotation_PID.derivative);
 };
 
 // Tries to auto calibrate arm motions
@@ -122,7 +114,7 @@ void Arm::periodic() {
             if (fabs(rotation_offset) < ROTATION_PID_ZONE)
             { this->upper_arm_motor.Set(-std::clamp(rotation_PID_controller.Calculate(rotation(), target_angle), -1.00, 1.00)); }
             else
-            { this->upper_arm_motor.Set(-std::clamp(rotation_offset, -1.00, 1.00)); }   
+            { this->upper_arm_motor.Set(-std::clamp(rotation_offset, -0.80, 0.80)); }   
         }
         
 
@@ -141,6 +133,14 @@ void Arm::periodic() {
         // Turns manual off when in correct locations.
         // if (fabs(rotation_offset) <= MOVMENT_SUCCESS_ZONE && fabs(extension_offset) <= MOVMENT_SUCCESS_ZONE)
         // { this->manual = true; }
+
+
+        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
+        {
+            hand_solenoid.Set(true);
+
+            // finished_cone_placment = true;
+        }
     }
 
     speed = speed.maximum(-1).minimum(1);
@@ -157,11 +157,20 @@ void Arm::periodic() {
 
 void Arm::set_direct_rotation(float input)
 { 
+    if (rotation() < MAX_UNSAFE_EXTENSION_ZONE && extension() > SAFE_TARGET_EXTENSION)
+    {
+        
+    }
+
     this->upper_arm_motor.Set(input);
 }
 
 void Arm::set_direct_extend(float input)
 {
+
+    if (rotation() < MAX_UNSAFE_EXTENSION_ZONE && extension() > SAFE_TARGET_EXTENSION)
+    { input = std::clamp(input, (float)0.00, (float)1.00); }
+
     this->lower_arm_motor.Set(input);
 }
 
@@ -173,35 +182,49 @@ void Arm::cone_auto_place_high(Drive &drive) {
 
     // if (Limelight::vertical_offset < 0.05 && Limelight::horizontal_offset < 0.05)
     // {
-        move_to_high();
 
-        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
-        {
-            hand_solenoid.Toggle();
-        }
+    move_to_high_cone();
     // }
 }
 
-void Arm::cone_auto_place_mid() {
+void Arm::cone_auto_place_mid(Drive &drive) {
+    if (!finished_cone_placment)
+        {
+            move_to_mid_cone();
+
+            if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
+            {
+                hand_solenoid.Set(true);
+
+                finished_cone_placment = true;
+            }
+        }
+        else
+        {
+            move_to_grab();
+
+            drive.speed += Vector2D{0.3, 0};
+        }
+
+    // this->manual = false;
+    // this->target_angle = 0;//Change ME!!!
+    // this->target_extension = 0;
+}
+
+void Arm::cube_auto_place_high(Drive &drive) {
     this->manual = false;
     this->target_angle = 0;//Change ME!!!
     this->target_extension = 0;
 }
 
-void Arm::cube_auto_place_high() {
-    this->manual = false;
-    this->target_angle = 0;//Change ME!!!
-    this->target_extension = 0;
-}
-
-void Arm::cube_auto_place_mid() {
+void Arm::cube_auto_place_mid(Drive &drive) {
     this->manual = false;
     this->target_angle = 0;//Change ME!!!
     this->target_extension = 0;
 }
 
 
-void Arm::move_to_high()
+void Arm::move_to_mid_cone()
 {
     this->manual = false;
 
@@ -209,11 +232,19 @@ void Arm::move_to_high()
     this->target_extension = 28.0;
 }
 
+void Arm::move_to_high_cone()
+{
+    this->manual = false;
+
+    this->target_angle = 164;
+    this->target_extension = 35.0;
+}
+
 void Arm::move_to_grab()
 {
     this->manual = false;
 
-    this->target_angle = 0;
-    this->target_extension = 5.0;
+    this->target_angle = -5;
+    this->target_extension = 4.0;
     this->hand_solenoid.Set(true);
 }
