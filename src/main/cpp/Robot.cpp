@@ -117,6 +117,11 @@ void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
     drive_train.speed = 
+    /*Vector2D
+    {
+        -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 5),
+        to_sigmoidal(drive_joystick.get_twist(0.3, 0.5), 5)
+    };*/
     Vector2D
     {
         -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 10),

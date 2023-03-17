@@ -106,6 +106,13 @@ class Robot : public frc::TimedRobot {
             // return 2 * sin(M_PI / 2 * input) * (1 / (1 + exp(-scale / 2 * input)) - 0.5) * (fabs(input) / input); 
             return 2 / (1 + exp(-scale * (fabs(input / 2) - 0.5))) * (fabs(input) / input);
         }
+        //
+        double to_exponential(double input) {
+            if (input == 0) {
+                return 0;
+            }
+            return exp(5.42*(fabs(input)-1))*(fabs(input)/input);
+        }
 
         void autonomus_place_cone()
         {

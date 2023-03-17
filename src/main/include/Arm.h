@@ -69,8 +69,8 @@ class Arm {
 
         // Sensor IDs
         short 
-        extension_potentiometer_port { 0 },
-        shoulder_encoder_channel { 4 };
+        extension_potentiometer_port { 4 },
+        shoulder_encoder_channel { 14 };
 
         frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; //0V to 5V
         frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
