@@ -158,6 +158,7 @@ class Robot : public frc::TimedRobot {
         Button lower_arm_button{4, arm_joystick.object, ALL};
 
         Button move_to_high_button{6, arm_joystick.object, PRESS};
+        Button move_to_mid_button{12, arm_joystick.object, PRESS};
         Button setup_grab_button{5, arm_joystick.object, PRESS};
 
         double time_remaining {0};

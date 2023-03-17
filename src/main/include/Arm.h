@@ -163,10 +163,6 @@ class Arm {
 
         void cone_auto_place_mid(Drive &);
 
-        void cube_auto_place_mid(Drive &);
-
-        void cube_auto_place_high(Drive &);
-
         void cone_auto_place_high(Drive &);
 
 };  

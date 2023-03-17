@@ -16,9 +16,14 @@
 class Gyro
 {
 private:
-    double current_angle;
 
 public:
+    double current_angle, previous_angle {0};
+    double linear_filter;
+
+    double change_constant {0.2};
+    double delta_angle;
+
     // IMU
     frc::ADIS16470_IMU imu;
 
