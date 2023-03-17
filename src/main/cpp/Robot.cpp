@@ -8,21 +8,21 @@
 
 using namespace std;
 
-PP posPls;
-
 void Robot::RobotInit() {
 
     server = frc::CameraServer::GetServer();
-
+    
     front_camera = frc::CameraServer::StartAutomaticCapture("Front Camera", 1);
     arm_camera = frc::CameraServer::StartAutomaticCapture("Arm Camera", 0);
 
     arm_camera.SetFPS(10);
     front_camera.SetFPS(20);
+    debug.out("Started Camera Server");
+
 
     front_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
     arm_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
-
+    debug.out("Set Connection Strategy");
 
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
@@ -53,6 +53,7 @@ void Robot::RobotInit() {
     drive_train.back_right_motor->RestoreFactoryDefaults();
     drive_train.front_left_motor->RestoreFactoryDefaults();
     drive_train.back_left_motor->RestoreFactoryDefaults();
+    debug.out("Reset Motor Defaults");
 
     drive_train.front_right_motor->SetInverted(true);
 
@@ -60,14 +61,15 @@ void Robot::RobotInit() {
     drive_train.back_left_motor->Follow(*drive_train.front_left_motor);
     drive_train.back_right_motor->Follow(*drive_train.front_right_motor);
 
-    power_distribution_board.ClearStickyFaults();
 
+    power_distribution_board.ClearStickyFaults();
     // IMU
     gyro.imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
     gyro.imu.Calibrate();
 
     gyro.imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kX);
 
+    debug.out("Finished RobotInit");
 }
 
 /**
@@ -82,6 +84,8 @@ void Robot::RobotPeriodic()
 {
     frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.linear_filter);
     frc::SmartDashboard::PutNumber("IMU Delta Angle", (double)gyro.delta_angle);
+
+    frc::SmartDashboard::PutNumber("Y Position" , position.spinPP());
 }
 
 /**
@@ -178,9 +182,15 @@ void Robot::TeleopPeriodic() {
     // Toggle Limelight LED
     if (button_2.is_active())
     {  
-        std::cout << "Toggle LED" << std::endl;
+        debug.out("Toggle LED");
 
         Limelight::toggle_led();
+    }
+
+    
+    if (button_6.is_active())
+    {
+        gyro.reset();
     }
 
     // Extension 6in for safe start distance
@@ -188,7 +198,7 @@ void Robot::TeleopPeriodic() {
     // Toggle Camera Mode
     if (button_3.is_active())
     {
-        cout << "Toggle Camera Mode" << endl;
+        debug.out("Toggle Camera Mode");
 
         Limelight::toggle_camera();
     }
@@ -228,7 +238,9 @@ void Robot::TeleopPeriodic() {
 
         // Toggle Hand Grip
         if (auto_arm_button.is_active())
-        { arm.hand_solenoid.Toggle(); }
+        { arm.hand_solenoid.Toggle();
+            debug.out("Hand Grip Toggled By Button");
+        }
 
         // Toggle Pole
         if (pole_arm_button.is_active())
@@ -240,7 +252,7 @@ void Robot::TeleopPeriodic() {
     // Moves arm to position for high cone
     if (move_to_high_button.is_active())
     { 
-        cout << "Setup High Cone" << endl;
+        debug.out("Setup High Cone");
 
         arm.move_to_high_cone(); 
     }
@@ -256,7 +268,7 @@ void Robot::TeleopPeriodic() {
     // Moves arm and extension to position for picking up
     if (setup_grab_button.is_active())
     { 
-        cout << "Setup Grab" << endl;
+        debug.out("Setup Grab");
 
         arm.move_to_grab();
     }
@@ -280,8 +292,9 @@ void Robot::TeleopPeriodic() {
 
     frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
     frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
+    frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.imu.GetAngle());
+
     
-    posPls.PPP();
 
     // std::cout << (double)imu.GetAngle() << std::endl;
 }
