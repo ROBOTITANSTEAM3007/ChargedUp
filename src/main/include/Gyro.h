@@ -22,7 +22,11 @@ public:
     // IMU
     frc::ADIS16470_IMU imu;
 
+    PID gyro_PID{0.05, 0.003, 0};
+    frc2::PIDController gyro_PID_controller{gyro_PID.proportion, gyro_PID.integral, gyro_PID.derivative};
+
     Gyro();
 
     void auto_level(Drive &);
+    void reset();
 };

@@ -116,46 +116,7 @@ class Robot : public frc::TimedRobot {
 
         void autonomus_place_cone()
         {
-            // Place Cone In Auto
-            // For Now, The Robot Drives Forward.
-
-
-            // Limelight::put_data("ledMode", 3);
-            // Limelight::put_data("pipeline", 0);
-
-            // double visible_target = Limelight::get_data("tv", 0);
-
-            // if (visible_target)
-            // {
-            //     double target_skew = Limelight::get_data("ts", 0);
-            //     double vertical_offset = Limelight::get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
-
-            //     double vertical_offset_percentage = -(Limelight::target_vertical_offset - vertical_offset) / 20.5;
-            //     // double skew_offset_percentage = Limelight::convert_angle(target_skew) / 10;
-
-            //     // if (skew_offset_percentage < 0.1)
-            //     // {
-            //     //     vertical_offset_percentage = 0;
-            //     // }
-
-            //     drive_train.speed = Vector3D{vertical_offset_percentage * Limelight::motion_pid.proportion, 0, 0}.minimum(Limelight::motion_limits);
-            // }
-            // else
-            // {
-                drive_train.speed = Vector2D{0.2, 0}.minimum(Limelight::motion_limits);
-            //     Limelight::put_data("pipeline", 0); // Pipe line of one target
-
-            //     visible_target = Limelight::get_data("tv", 0);
-            
-            //     if (visible_target)
-            //     {
-            //         Limelight::put_data("pipeline", 0); 
-                    
-
-            //     }
-            // }
-
-            // drive_train.periodic();
+            drive_train.speed = Vector2D{0.2, 0}.minimum(Limelight::motion_limits);
         }
 
 // End Of ARM
@@ -176,7 +137,7 @@ class Robot : public frc::TimedRobot {
 
         Button button_1{1, drive_joystick.object, ALL}; // Limelight Autoalign
         Button button_2{2, drive_joystick.object, PRESS}; // Toggle LED
-        Button button_6{6, drive_joystick.object, PRESS}; // Switch Camera
+        Button button_6{6, drive_joystick.object, PRESS}; // Reset IMU
         Button button_3{3, drive_joystick.object, PRESS}; // Toggle Camera Mode
 
         Button auto_level_button{5, drive_joystick.object, ALL}; // Autolevel
@@ -189,6 +150,8 @@ class Robot : public frc::TimedRobot {
 
         Button move_to_high_button{6, arm_joystick.object, PRESS};
         Button setup_grab_button{5, arm_joystick.object, PRESS};
+
+        double time_remaining {0};
 
     private:
         frc::SendableChooser<std::string> auto_chooser;

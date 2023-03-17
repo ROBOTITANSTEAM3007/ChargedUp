@@ -68,7 +68,7 @@ void Limelight::retroreflective_auto_align(Drive &drive)
         //     vertical_offset = 0;
         // }
 
-        drive.speed += Vector2D{0, motion_PID_controller.Calculate(percentage_horizontal_offset, 0)};
+        drive.speed += Vector2D{0, std::clamp(motion_PID_controller.Calculate(horizontal_offset, 0), -0.50, 0.50)};
     }
     else
     {
