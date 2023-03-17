@@ -6,7 +6,6 @@
 // // Shoulder Motor
 
 // // Shoulder Encoder
-// // 
 
 
 #include <frc/Solenoid.h>
@@ -17,19 +16,47 @@
 #include <frc/Joystick.h>
 #include <iostream>
 #include <rev/CANSparkMax.h>
+#include <frc/controller/PIDController.h>
+
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "Vector2D.h"
+#include "Limelight.h"
+#include "Drive.h"
 
 // Height limit is 78 inches
-#define UPPER_ARM_LENGTH 15.6 // inches
+// 52 Height rule limit
 
+// Robot Component Constants
+#define SHOULDER_HEIGHT 19.0 // inches
+#define UPPER_ARM_LENGTH 15.6 // inches
+#define RETRACTED_LOWER_ARM_LENGTH 23.7 //inches
+
+// Robot Sensor Constants
 #define MAX_ARM_EXTENSION 35.3 // inches
 #define MIN_ARM_EXTENSION 0 // inches
+
+#define POTENTIOMETER_OFFSET 0.14 // 0 - 1
+#define ENCODER_OFFSET 0.17 // 0 - 1
 
 #define MAX_ARM_ROTATION 360 // degrees
 #define MIN_ARM_ROTATION 0 // degrees
 
-#define ARM_EXTENSION_CONSTANT 0.0226022305
+#define ARM_EXTENSION_CONSTANT 44.24342102 // Was 0.0226022305, inches
+#define ARM_ROTATION_CONSTANT 360.00 // degrees
+
+#define SAFE_TARGET_EXTENSION 26.3 // inches 
+
+// Zones where gravity will impact the extension
+#define MIN_UNSAFE_EXTENSION_ZONE 45
+#define MAX_UNSAFE_EXTENSION_ZONE 130
+
+#define FREE_EXTENSION_POINT 140
+
+#define MOVMENT_SUCCESS_ZONE 0.01
+
+#define ROTATION_PID_ZONE 20 // Degrees
+#define EXTENSION_PID_ZONE 5 // Inches
 
 
 // NOTE!: 50in is the max length the arm can extend to stay inside the hight limit.
@@ -58,15 +85,17 @@ class Arm {
         hand_solenoid_channel { 0 },
         pole_solenoid_channel { 4 };
 
-        double previous_potentiometer_value { 0 };
+        // Potentiometer
+        double current_potentiometer_value, previous_potentiometer_value { 0 };
 
         float ext[10];
 
-        double avrgExtension;
+        double avrgExtension; 
 
         short iterations = 0;
 
-        double angle_offset;
+        // Arm Calibration & Movment
+        double rotation_offset, extension_offset, safe_extension_offset;
 
         double maxArmLength = 54.4;
 
@@ -76,12 +105,14 @@ class Arm {
 
         float extensionLength; //measured in inches sadly.
 
-        float extension_offset;
-
-        //frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
-
     public:
+        PID rotation_PID{0.02, 0, 0};
+        PID extension_PID{0.02, 0, 0};
 
+        frc2::PIDController rotation_PID_controller{rotation_PID.proportion, rotation_PID.integral, rotation_PID.derivative};
+        frc2::PIDController extension_PID_controller{extension_PID.proportion, extension_PID.integral, extension_PID.derivative};
+
+        Vector2D speed;
         bool manual {true};
 
         double target_extension{0}; // 0 - 35.3 inches
@@ -98,27 +129,38 @@ class Arm {
 
         Arm();
 
-        void reset_encoder()
-        { encoder.Reset();}
-
-        double rotation()
-        { return encoder.GetAbsolutePosition(); } // Degrees
+        double rotation();
         
         double extension();
 
-        double get_potentiometer_value();
+        double potentiometer_value();
 
-        double distance()
-        { return sqrt(pow(/*arm extension*/1, 2) * pow(UPPER_ARM_LENGTH, 2)); }
+        double distance();
+
+        double height();
+
+        void update_average_extension(double);
 
         void calibrate(frc::Joystick *stick); //Linear regression from arm at shortest and longest extension
  
-        void set_direct_extend(float x);
 
-        void set_direct_rotation(float x);
+        void set_direct_extend(float);
+
+        void set_direct_rotation(float);
 
         void periodic();
 
-        void cone_auto_place_high();
+
+        void move_to_high();
+        void move_to_grab();
+
+
+        void cone_auto_place_mid();
+
+        void cube_auto_place_mid();
+
+        void cube_auto_place_high();
+
+        void cone_auto_place_high(Drive &);
 
 };  

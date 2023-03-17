@@ -10,7 +10,7 @@
 
 #include "Drive.h"
 
-#define VERTICAL_DISTANCE_OFFSET 14.0
+#define VERTICAL_DISTANCE_OFFSET 3.0
 
 namespace LED { enum {ON, OFF, TOGGLE}; }
 namespace CAM { enum {DRIVER, COMPUTER, TOGGLE}; }
@@ -23,8 +23,9 @@ private:
 
 public:
     // Motion Properties
-    static inline PID motion_pid{0.25, 0, 0};
-    static inline Vector2D motion_limits{0.25, 1};
+    static inline PID motion_PID{0.5, 0.001, 0};
+    static inline frc2::PIDController motion_PID_controller{motion_PID.proportion, motion_PID.integral, motion_PID.derivative};
+    static inline Vector2D motion_limits{1, 1};
     static inline double target_vertical_offset{0};
 
     // Limelight Networktable Values

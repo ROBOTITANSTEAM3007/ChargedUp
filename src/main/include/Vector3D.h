@@ -1,5 +1,7 @@
 #pragma once
 
+#define M_PI 3.14159265358979323846
+
 struct Vector3D
 {
     double x, y, z;
@@ -84,9 +86,9 @@ struct Vector3D
     {
         return Vector3D
         {
-            (fabs(x) < value ? x : value * (x/fabs(x))),
-            (fabs(y) < value ? y : value * (y/fabs(y))),
-            (fabs(z) < value ? z : value * (z/fabs(z)))
+            (x < value ? x : value),
+            (y < value ? y : value),
+            (z < value ? z : value)
         };
     }
 
@@ -94,9 +96,9 @@ struct Vector3D
     {
         return Vector3D
         {
-            (fabs(x) < t_vector.x ? x : t_vector.x * (x/fabs(x))),
-            (fabs(y) < t_vector.y ? y : t_vector.y * (y/fabs(y))),
-            (fabs(z) < t_vector.z ? z : t_vector.z * (z/fabs(z)))
+            (x < t_vector.x ? x : t_vector.x),
+            (y < t_vector.y ? y : t_vector.y),
+            (z < t_vector.z ? z : t_vector.z)
         };
     }
 
@@ -104,9 +106,9 @@ struct Vector3D
     {
         return Vector3D
         {
-            (fabs(x) > value ? x : value * (x/fabs(x))),
-            (fabs(y) > value ? y : value * (y/fabs(y))),
-            (fabs(z) > value ? z : value * (z/fabs(z)))
+            (x > value ? x : value),
+            (y > value ? y : value),
+            (z > value ? z : value)
         };
     }
 
@@ -114,29 +116,9 @@ struct Vector3D
     {
         return Vector3D
         {
-            (fabs(x) > t_vector.x ? x : t_vector.x * (x/fabs(x))),
-            (fabs(y) > t_vector.y ? y : t_vector.y * (y/fabs(y))),
-            (fabs(z) > t_vector.z ? z : t_vector.z * (z/fabs(z)))
-        };
-    }
-
-    Vector3D deadzone(const Vector3D &t_vector)
-    {
-        return Vector3D
-        {
-            (fabs(x) > t_vector.x ? x : 0),
-            (fabs(y) > t_vector.y ? y : 0),
-            (fabs(z) > t_vector.z ? z : 0)
-        };
-    }
-
-    Vector3D deadzone(double value)
-    {
-        return Vector3D
-        {
-            (fabs(x) > value ? x : 0),
-            (fabs(y) > value ? y : 0),
-            (fabs(z) > value ? z : 0)
+            (x > t_vector.x ? x : t_vector.x),
+            (y > t_vector.y ? y : t_vector.y),
+            (z > t_vector.z ? z : t_vector.z)
         };
     }
 

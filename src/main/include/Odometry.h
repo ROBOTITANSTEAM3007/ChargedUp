@@ -15,7 +15,7 @@ back_right_location{};
 // Creating my kinematics object using the wheel locations.
 frc::MecanumDriveKinematics mecanum_kinematics {front_left_location, front_right_location, back_left_location, back_right_location};
 
-frc::Rotation2d robot_orientation{Gyro::imu.GetAngle()};
+// frc::Rotation2d robot_orientation{Gyro::imu.GetAngle()};
 
 // frc::MecanumDriveWheelPositions
 // {
