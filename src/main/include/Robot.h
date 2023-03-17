@@ -17,6 +17,7 @@
 #include <frc/PneumaticsControlModule.h>
 #include <frc/Compressor.h>
 #include <frc/Solenoid.h>
+#include "Debug.h"
 #include <frc/DutyCycleEncoder.h>
 
 
@@ -83,10 +84,18 @@ class Robot : public frc::TimedRobot {
         cs::VideoSource front_camera;
         cs::VideoSource arm_camera;
 
+        dbg debug;
+
         cs::VideoSink server;
 
         // DRIVE
         Drive drive_train{front_left_motor_ID, back_left_motor_ID, front_right_motor_ID, back_right_motor_ID};    
+
+        rev::SparkMaxRelativeEncoder rel = drive_train.back_right_motor->GetEncoder();
+        //drive_train.back_left_motor
+
+        PP position{&rel};
+
 
         // ARM
         Arm arm;

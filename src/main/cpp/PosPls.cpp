@@ -2,11 +2,13 @@
 #include "PosPls.h"
 
 
-PP::PP() {
+PP::PP(rev::SparkMaxRelativeEncoder* inRel) {
     previous_tick = std::chrono::high_resolution_clock::now();
+    rel=inRel;
+    lastPosition = rel->GetPosition();
 }
 
-void PP::PPP() {
+/*void PP::PPP() {
 
     this->current_tick = std::chrono::high_resolution_clock::now();
 
@@ -45,4 +47,14 @@ void PP::PPP() {
     this->lastAcceleration = this->Acceleration;
 
     this->previous_tick = std::chrono::high_resolution_clock::now();
+}*/
+
+
+double PP::spinPP() {
+    posDifference = rel->GetPosition() - lastPosition;
+    posDifference /= 10.71;
+    posDifference *= 18.849555924; //Circumfrence in inches
+    pos.y += posDifference;
+    lastPosition = rel->GetPosition();
+    return(pos.y);
 }

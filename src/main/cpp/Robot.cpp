@@ -8,18 +8,18 @@
 
 using namespace std;
 
-PP posPls;
-
 void Robot::RobotInit() {
 
     server = frc::CameraServer::GetServer();
-
+    
     front_camera = frc::CameraServer::StartAutomaticCapture("Front Camera", 1);
     arm_camera = frc::CameraServer::StartAutomaticCapture("Arm Camera", 0);
+    debug.out("Started Camera Server");
+
 
     front_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
     arm_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
-
+    debug.out("Set Connection Strategy");
 
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
@@ -34,6 +34,7 @@ void Robot::RobotInit() {
     drive_train.back_right_motor->RestoreFactoryDefaults();
     drive_train.front_left_motor->RestoreFactoryDefaults();
     drive_train.back_left_motor->RestoreFactoryDefaults();
+    debug.out("Reset Motor Defaults");
 
     drive_train.front_right_motor->SetInverted(true);
 
@@ -41,14 +42,15 @@ void Robot::RobotInit() {
     drive_train.back_left_motor->Follow(*drive_train.front_left_motor);
     drive_train.back_right_motor->Follow(*drive_train.front_right_motor);
 
-    power_distribution_board.ClearStickyFaults();
 
+    power_distribution_board.ClearStickyFaults();
     // IMU
     gyro.imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
     gyro.imu.Calibrate();
 
     gyro.imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kY);
 
+    debug.out("Finished RobotInit");
 }
 
 /**
@@ -59,7 +61,9 @@ void Robot::RobotInit() {
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-void Robot::RobotPeriodic() {}
+void Robot::RobotPeriodic() {
+    frc::SmartDashboard::PutNumber("Y Position" , position.spinPP());
+}
 
 /**
  * This autonomous (along with the chooser code above) shows how to select
@@ -136,34 +140,18 @@ void Robot::TeleopPeriodic() {
     // Toggle Limelight LED
     if (button_2.is_active())
     {  
-        std::cout << "Toggle LED" << std::endl;
+        debug.out("Toggle LED");
 
         Limelight::toggle_led();
     }
 
-    // Switch Camera
-    if (button_6.is_active())
-    {
-        // std::cout << "Change Camera from: " << server.GetSource().GetName() << std::endl;
-
-        // if (server.GetSource().GetName() == arm_camera.GetName())
-        // {
-        //     // camera_selection.SetString(front_camera.GetName());
-        //     server.SetSource(front_camera);
-        // }
-        // else
-        // {
-        //     // camera_selection.SetString(arm_camera.GetName());
-        //     server.SetSource(arm_camera);
-        // }
-    }
 
     // Extension 6in for safe start distance
 
     // Toggle Camera Mode
     if (button_3.is_active())
     {
-        cout << "Toggle Camera Mode" << endl;
+        debug.out("Toggle Camera Mode");
 
         Limelight::toggle_camera();
     }
@@ -198,7 +186,9 @@ void Robot::TeleopPeriodic() {
 
         // Toggle Hand Grip
         if (auto_arm_button.is_active())
-        { arm.hand_solenoid.Toggle(); }
+        { arm.hand_solenoid.Toggle();
+            debug.out("Hand Grip Toggled By Button");
+        }
 
         // Toggle Pole
         if (pole_arm_button.is_active())
@@ -210,7 +200,7 @@ void Robot::TeleopPeriodic() {
     // Moves arm to position for high cone
     if (move_to_high_button.is_active())
     { 
-        cout << "Setup High Cone" << endl;
+        debug.out("Setup High Cone");
 
         arm.move_to_high(); 
     }
@@ -218,7 +208,7 @@ void Robot::TeleopPeriodic() {
     // Moves arm and extension to position for picking up
     if (setup_grab_button.is_active())
     { 
-        cout << "Setup Grab" << endl;
+        debug.out("Setup Grab");
 
         arm.move_to_grab();
     }
@@ -237,7 +227,6 @@ void Robot::TeleopPeriodic() {
     frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.imu.GetAngle());
 
     
-    posPls.PPP();
 
     // std::cout << (double)imu.GetAngle() << std::endl;
 }
