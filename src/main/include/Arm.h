@@ -28,7 +28,7 @@
 // 52 Height rule limit
 
 // Robot Component Constants
-#define SHOULDER_HEIGHT 19.0 // inches
+#define SHOULDER_HEIGHT 23.5 // inches
 #define UPPER_ARM_LENGTH 15.6 // inches
 #define RETRACTED_LOWER_ARM_LENGTH 23.7 //inches
 
@@ -45,7 +45,7 @@
 #define ARM_EXTENSION_CONSTANT 44.24342102 // Was 0.0226022305, inches
 #define ARM_ROTATION_CONSTANT 360.00 // degrees
 
-#define SAFE_TARGET_EXTENSION 23.3 // inches 
+#define SAFE_TARGET_EXTENSION 30.0 // inches 
 
 // Zones where gravity will impact the extension
 #define MIN_UNSAFE_EXTENSION_ZONE 45
@@ -69,6 +69,7 @@ class Arm {
 
         // Stages
         bool finished_cone_placment {false};
+        bool finished_forward_drive {false};
 
         // Sensor IDs
         short 

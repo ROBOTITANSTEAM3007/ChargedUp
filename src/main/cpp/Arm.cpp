@@ -139,8 +139,13 @@ void Arm::periodic() {
         {
             hand_solenoid.Set(true);
 
-            // finished_cone_placment = true;
+            finished_cone_placment = true;
         }
+
+        if (!finished_forward_drive)
+        {
+
+        };
     }
 
     speed = speed.maximum(-1).minimum(1);
@@ -157,12 +162,15 @@ void Arm::periodic() {
 
 void Arm::set_direct_rotation(float input)
 { 
-    if (rotation() < MAX_UNSAFE_EXTENSION_ZONE && extension() > SAFE_TARGET_EXTENSION)
+    if (rotation() < MAX_UNSAFE_EXTENSION_ZONE && extension() > SAFE_TARGET_EXTENSION && input != 0)
     {
-        
+        this->upper_arm_motor.Set(0);
+        this->lower_arm_motor.Set(1);
     }
-
-    this->upper_arm_motor.Set(input);
+    else
+    {
+        this->upper_arm_motor.Set(input);
+    }
 }
 
 void Arm::set_direct_extend(float input)
@@ -181,9 +189,17 @@ void Arm::cone_auto_place_high(Drive &drive) {
     // Limelight::retroreflective_auto_align(drive);
 
     // if (Limelight::vertical_offset < 0.05 && Limelight::horizontal_offset < 0.05)
-    // {
+    // {    
 
-    move_to_high_cone();
+        if (!finished_cone_placment)
+        {
+            move_to_high_cone();
+        }
+        else if (!finished_forward_drive)
+        {
+            move_to_grab();
+            drive.speed = Vector2D{0.5, 0};
+        }
     // }
 }
 
@@ -212,9 +228,7 @@ void Arm::cone_auto_place_mid(Drive &drive) {
 }
 
 void Arm::cube_auto_place_high(Drive &drive) {
-    this->manual = false;
-    this->target_angle = 0;//Change ME!!!
-    this->target_extension = 0;
+    // auto_
 }
 
 void Arm::cube_auto_place_mid(Drive &drive) {
@@ -228,8 +242,8 @@ void Arm::move_to_mid_cone()
 {
     this->manual = false;
 
-    this->target_angle = 155;
-    this->target_extension = 28.0;
+    this->target_angle = 177;
+    this->target_extension = 14.7;
 }
 
 void Arm::move_to_high_cone()
@@ -237,7 +251,7 @@ void Arm::move_to_high_cone()
     this->manual = false;
 
     this->target_angle = 164;
-    this->target_extension = 35.0;
+    this->target_extension = 33.0;
 }
 
 void Arm::move_to_grab()

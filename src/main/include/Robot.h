@@ -137,7 +137,7 @@ class Robot : public frc::TimedRobot {
 
         Button button_1{1, drive_joystick.object, ALL}; // Limelight Autoalign
         Button button_2{2, drive_joystick.object, PRESS}; // Toggle LED
-        Button button_6{6, drive_joystick.object, PRESS}; // Switch Camera
+        Button button_6{6, drive_joystick.object, PRESS}; // Reset IMU
         Button button_3{3, drive_joystick.object, PRESS}; // Toggle Camera Mode
 
         Button auto_level_button{5, drive_joystick.object, ALL}; // Autolevel
@@ -150,6 +150,8 @@ class Robot : public frc::TimedRobot {
 
         Button move_to_high_button{6, arm_joystick.object, PRESS};
         Button setup_grab_button{5, arm_joystick.object, PRESS};
+
+        double time_remaining {0};
 
     private:
         frc::SendableChooser<std::string> auto_chooser;

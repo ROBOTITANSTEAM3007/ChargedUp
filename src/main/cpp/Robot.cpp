@@ -45,6 +45,12 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Rotation I", arm.rotation_PID.integral);
     frc::SmartDashboard::PutNumber("Rotation D", arm.rotation_PID.derivative);
 
+    frc::SmartDashboard::PutNumber("Leveling P", gyro.gyro_PID.proportion);
+    frc::SmartDashboard::PutNumber("Leveling I", gyro.gyro_PID.integral);
+    frc::SmartDashboard::PutNumber("Leveling D", gyro.gyro_PID.derivative);
+
+    frc::SmartDashboard::PutNumber("Auto Drive Time", 0);
+
     drive_train.front_right_motor->RestoreFactoryDefaults();
     drive_train.back_right_motor->RestoreFactoryDefaults();
     drive_train.front_left_motor->RestoreFactoryDefaults();
@@ -108,9 +114,9 @@ void Robot::AutonomousInit() {
     // } else if (selected_auto == cube_high) {
     //     arm.cube_auto_place_mid();
 
-    // } else {
-    //     // Default Auto goes here
-    // }
+    else {
+        // Default Auto goes here
+    }
 }
 
 void Robot::AutonomousPeriodic() {
@@ -171,7 +177,7 @@ void Robot::TeleopPeriodic() {
     { Limelight::retroreflective_auto_align(drive_train); }
 
     // Tries to Auto Level on the charging station
-    if (auto_level_button.is_active()) // 5
+    if (auto_level_button.is_active()) // Button 5
     {
         gyro.auto_level(drive_train);
         // gyro.imu.get
@@ -183,23 +189,6 @@ void Robot::TeleopPeriodic() {
         std::cout << "Toggle LED" << std::endl;
 
         Limelight::toggle_led();
-    }
-
-    // Switch Camera
-    if (button_6.is_active())
-    {
-        // std::cout << "Change Camera from: " << server.GetSource().GetName() << std::endl;
-
-        // if (server.GetSource().GetName() == arm_camera.GetName())
-        // {
-        //     // camera_selection.SetString(front_camera.GetName());
-        //     server.SetSource(front_camera);
-        // }
-        // else
-        // {
-        //     // camera_selection.SetString(arm_camera.GetName());
-        //     server.SetSource(arm_camera);
-        // }
     }
 
     // Extension 6in for safe start distance
@@ -215,6 +204,11 @@ void Robot::TeleopPeriodic() {
     // frc::PowerDistribution::Faults current_fault = power_distribution_board.GetFaults(); // Channel 3
 
     // frc::SmartDashboard::PutNumber("Power", arm.upper_arm_motor.GetOutputCurrent());
+
+    if (button_6.is_active())
+    {
+        gyro.reset();
+    }
 
     // Manual Arm Control
 
@@ -270,6 +264,14 @@ void Robot::TeleopPeriodic() {
     // arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
     // arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", POTENTIOMETER_OFFSET);
 
+    time_remaining = frc::SmartDashboard::GetNumber("Auto Drive Time", 0);
+    if (time_remaining > 0)
+    {
+        drive_train.speed += Vector2D{0.5, 0};
+
+        frc::SmartDashboard::PutNumber("Auto Drive Time", time_remaining - 20);
+    }
+
     arm.periodic();
     drive_train.periodic();
 
@@ -278,7 +280,6 @@ void Robot::TeleopPeriodic() {
 
     frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
     frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
-
     
     posPls.PPP();
 
