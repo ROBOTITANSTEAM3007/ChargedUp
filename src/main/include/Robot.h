@@ -172,5 +172,6 @@ class Robot : public frc::TimedRobot {
         const std::string cube_high = "Don't Be Square Man";
         const std::string cone_mid = "Pretty Mid Cone Der Bud";
         const std::string cube_mid = "Sure Of Course A Square like You Would Make That Kind Of Mid Decission";
+        const std::string dock = "Dock";
         std::string selected_auto;
 };

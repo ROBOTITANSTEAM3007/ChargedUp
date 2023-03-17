@@ -170,7 +170,7 @@ void Arm::set_direct_extend(float input)
 }
 
 
-void Arm::cone_auto_place_high(Drive &drive) {
+bool Arm::cone_auto_place_high(Drive &drive) {
     // Limelight::toggle_led(LED::ON);
 
     // Limelight::retroreflective_auto_align(drive);
@@ -187,14 +187,19 @@ void Arm::cone_auto_place_high(Drive &drive) {
                 hand_solenoid.Set(true);
 
                 finished_cone_placment = true;
+                i=0;
             }
         }
-        else if (!finished_forward_drive)
+        else if (finished_cone_placment = true)
         {
             move_to_grab();
-            drive.speed = Vector2D{0.5, 0};
+            i++;
+            if(i < 100) {
+                return true;
+            }
         }
     // }
+    return false;
 }
 
 void Arm::cone_auto_place_mid(Drive &drive) {
@@ -241,7 +246,7 @@ void Arm::move_to_grab()
 {
     this->manual = false;
 
-    this->target_angle = -5;
+    this->target_angle = 0;
     this->target_extension = 4.0;
     this->hand_solenoid.Set(true);
 }

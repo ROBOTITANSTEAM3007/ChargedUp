@@ -94,6 +94,8 @@ class Arm {
 
         float ext[10];
 
+        int i = 0;
+
         double avrgExtension; 
 
         short iterations = 0;
@@ -163,6 +165,6 @@ class Arm {
 
         void cone_auto_place_mid(Drive &);
 
-        void cone_auto_place_high(Drive &);
+        bool cone_auto_place_high(Drive &);
 
 };  

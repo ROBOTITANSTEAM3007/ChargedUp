@@ -30,6 +30,7 @@ void Robot::RobotInit() {
     auto_chooser.AddOption(cone_high, cone_high);
     auto_chooser.AddOption(cone_mid, cone_mid);
     auto_chooser.AddOption(cube_high, cube_high);
+    auto_chooser.AddOption(dock, dock);
     auto_chooser.AddOption(cube_mid, cube_high);
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
@@ -101,12 +102,15 @@ void Robot::RobotPeriodic()
  */
 void Robot::AutonomousInit() {
     selected_auto = auto_chooser.GetSelected();
-    selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
+    //selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
 
     if (selected_auto == auto_profile_testing) {
         
     } else if (selected_auto == cone_high) {
         arm.cone_auto_place_high(drive_train);
+    } else if (selected_auto == dock) {
+        position.pos.y = 0;
+        gyro.reset();
     }
     // } else if (selected_auto == cone_mid) {
     //     arm.cone_auto_place_mid();
@@ -120,11 +124,12 @@ void Robot::AutonomousInit() {
     else {
         // Default Auto goes here
     }
+    debug.out("Selected Auto = " + selected_auto);
 }
 
 void Robot::AutonomousPeriodic() {
     if (selected_auto == auto_profile_whole_hog) {
-        drive_train.speed = Vector2D{0.8, 0};
+        drive_train.speed = Vector2D{1, 0};
     }
 
     if (selected_auto == auto_profile_testing) {
@@ -134,6 +139,15 @@ void Robot::AutonomousPeriodic() {
 
     } else if (selected_auto == cone_mid) {
         arm.cone_auto_place_mid(drive_train);
+    } else if (selected_auto == dock) {
+        if(arm.cone_auto_place_high(drive_train)){
+            if (position.spinPP() < 75){
+                drive_train.speed = Vector2D(0.65, 0);
+            } else {
+                gyro.auto_level(drive_train);
+            }
+        }
+        
     } else {
         // Default Auto goes here
     }

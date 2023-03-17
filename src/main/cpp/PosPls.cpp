@@ -49,12 +49,12 @@ PP::PP(rev::SparkMaxRelativeEncoder* inRel) {
     this->previous_tick = std::chrono::high_resolution_clock::now();
 }*/
 
-
+//Returns inches
 double PP::spinPP() {
     posDifference = rel->GetPosition() - lastPosition;
     posDifference /= 10.71;
     posDifference *= 18.849555924; //Circumfrence in inches
     pos.y += posDifference;
     lastPosition = rel->GetPosition();
-    return(pos.y);
+    return(pos.y); 
 }
