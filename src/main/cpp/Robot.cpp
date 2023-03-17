@@ -106,7 +106,7 @@ void Robot::TeleopPeriodic() {
     Vector2D
     {
         -to_exponential(drive_joystick.get_y(0.2, 1.0)),
-        to_exponential(drive_joystick.get_twist(0.3, 0.5))
+        -to_exponential(drive_joystick.get_twist(0.3, 0.75))
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;
@@ -190,7 +190,7 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    arm.manual = false;
+    // arm.manual = false;
 
     arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
     arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", 0.15);

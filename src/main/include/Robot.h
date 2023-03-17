@@ -99,10 +99,7 @@ class Robot : public frc::TimedRobot {
             if (input == 0) {
                 return 0;
             }
-            if (input > 0) 
-                return pow(M_E, (input * 5.42)-5.42);
-            if (input < 0)
-                return pow(M_E, (-input * 5.42)-5.42);
+            return exp(5.42*(fabs(input)-1))*(fabs(input)/input);
         }
 
         void autonomus_place_cone()
