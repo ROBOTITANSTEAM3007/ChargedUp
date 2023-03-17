@@ -10,17 +10,45 @@
 
 #include "Drive.h"
 
+#define VERTICAL_DISTANCE_OFFSET 3.0
+
+namespace LED { enum {ON, OFF, TOGGLE}; }
+namespace CAM { enum {DRIVER, COMPUTER, TOGGLE}; }
+
+
+
 class Limelight
 {
 private:
+
+public:
+    // Motion Properties
+    static inline PID motion_PID{0.5, 0.001, 0};
+    static inline frc2::PIDController motion_PID_controller{motion_PID.proportion, motion_PID.integral, motion_PID.derivative};
+    static inline Vector2D motion_limits{1, 1};
+    static inline double target_vertical_offset{0};
+
+    // Limelight Networktable Values
+    static inline double 
+    visible_target,
+    horizontal_offset, // -27 degrees to 27 degrees (54 degrees)
+    vertical_offset; // -20.5 degrees to 20.5 degrees (41 degrees)
+
+    // Vision Offsets
+    static inline double
+    percentage_horizontal_offset,
+    percentage_vertical_offset;
+
+    // Connecting To Limelight Network Tables
+    static inline nt::NetworkTableInstance network_instance;
     static std::shared_ptr<nt::NetworkTable> get_table()
     {
-        nt::NetworkTableInstance network_instance = nt::NetworkTableInstance::GetDefault();
+        network_instance = nt::NetworkTableInstance::GetDefault();
 
         return network_instance.GetTable("limelight");
     };
+    
 
-public:
     static void put_data(const std::string name, double data)
     { get_table()->PutNumber(name, data); }
 
@@ -28,4 +56,7 @@ public:
     { return get_table()->GetNumber(name, fail); }
 
     static void retroreflective_auto_align(Drive &);
+
+    static void toggle_led(short = LED::TOGGLE);
+    static void toggle_camera(short = CAM::TOGGLE);
 };

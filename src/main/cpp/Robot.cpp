@@ -8,11 +8,27 @@
 
 using namespace std;
 
+PP posPls;
+
 void Robot::RobotInit() {
+
+    server = frc::CameraServer::GetServer();
+
+    front_camera = frc::CameraServer::StartAutomaticCapture("Front Camera", 1);
+    arm_camera = frc::CameraServer::StartAutomaticCapture("Arm Camera", 0);
+
+    front_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
+    arm_camera.SetConnectionStrategy(cs::VideoSource::ConnectionStrategy::kConnectionKeepOpen);
+
+
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
     auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
+    auto_chooser.AddOption(auto_profile_whole_hog, auto_profile_whole_hog);
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
+
+    frc::SmartDashboard::PutNumber("Target Extension", arm.target_extension);
+    frc::SmartDashboard::PutNumber("Target Rotation", arm.target_angle);
 
     drive_train.front_right_motor->RestoreFactoryDefaults();
     drive_train.back_right_motor->RestoreFactoryDefaults();
@@ -20,14 +36,19 @@ void Robot::RobotInit() {
     drive_train.back_left_motor->RestoreFactoryDefaults();
 
     drive_train.front_right_motor->SetInverted(true);
-    drive_train.back_right_motor->SetInverted(true);
 
-    Gyro::imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
-    Gyro::imu.Calibrate();
-    Gyro::imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
+    // Motors are now following each other
+    drive_train.back_left_motor->Follow(*drive_train.front_left_motor);
+    drive_train.back_right_motor->Follow(*drive_train.front_right_motor);
 
-    Arm::reset_encoder();
-    Arm::lower_left_arm_motor.Follow(Arm::lower_right_arm_motor);
+    power_distribution_board.ClearStickyFaults();
+
+    // IMU
+    gyro.imu.ConfigCalTime(frc::ADIS16470_IMU::CalibrationTime::_16s); // Default: 4s
+    gyro.imu.Calibrate();
+
+    gyro.imu.SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kY);
+
 }
 
 /**
@@ -55,111 +76,170 @@ void Robot::AutonomousInit() {
     selected_auto = auto_chooser.GetSelected();
     selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
 
-    // fmt::print("Auto selected: {}\n", selected_auto);
-
     if (selected_auto == auto_profile_testing) {
         
+    } else if (selected_auto == cone_high) {
+        // arm.cone_auto_place_high(drive_train);
+
+    } else if (selected_auto == cone_mid) {
+        arm.cone_auto_place_mid();
+
+    } else if (selected_auto == cube_high) {
+        arm.cube_auto_place_high();
+
+    } else if (selected_auto == cube_high) {
+        arm.cube_auto_place_mid();
+
     } else {
         // Default Auto goes here
+        
   }
 }
 
 void Robot::AutonomousPeriodic() {
-
-    if (selected_auto == auto_profile_testing) {
-        // Custom Auto goes here
-    } else {
-        // Default Auto goes here
+    if (selected_auto == auto_profile_whole_hog) {
+        drive_train.speed = Vector2D{0.8, 0};
     }
+    else if (selected_auto == auto_profile_testing) {
+        // Custom Auto goes here
+    } 
+    else {
+        // Default Auto goes here
+        // autonomus_place_cone();
+        // arm.cone_auto_place_high(drive_train);
+    }
+
+    arm.periodic();
+    drive_train.periodic();
 }
 
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-    Gyro::update();
+    drive_train.speed = 
+    Vector2D
+    {
+        -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 10),
+        -to_sigmoidal(drive_joystick.get_twist(0.3, 0.8), 10)
+    };
+    
+    // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;
 
-    std::cout << "Acceleration: " << Gyro::acceleration.x << " " << Gyro::acceleration.y << " " << Gyro::acceleration.z << std::endl;
-    std::cout << "Position: " << Gyro::position.x << " " << Gyro::position.y << " " << Gyro::position.z << std::endl;
-
-    frc::SmartDashboard::PutNumber("AX", Gyro::acceleration.x);
-    frc::SmartDashboard::PutNumber("AY", Gyro::acceleration.y);
-    frc::SmartDashboard::PutNumber("AZ", Gyro::acceleration.z);
-
-    frc::SmartDashboard::PutNumber("VX", Gyro::velocity.x);
-    frc::SmartDashboard::PutNumber("VY", Gyro::velocity.y);
-    frc::SmartDashboard::PutNumber("VZ", Gyro::velocity.z);
-
-    frc::SmartDashboard::PutNumber("PX", Gyro::position.x);
-    frc::SmartDashboard::PutNumber("PY", Gyro::position.y);
-    frc::SmartDashboard::PutNumber("PZ", Gyro::position.z);
-
-    // Default: Twist, X, Y
-    // drive_train.DriveCartesian(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
-    // this commented drive is here to help me with merging
-    // drive_train.DriveCartesian(drive_joystick.get_twist(0.3, 0.3), drive_joystick.get_x(0.15, 0.4), -drive_joystick.get_y(0.15, 1.0));
-
-    drive_train.speed.set(-drive_joystick.get_y(0.15, 1.0), drive_joystick.get_x(0.15, 0.4), drive_joystick.get_twist(0.3, 0.3));
-    drive_train.orientation = Gyro::imu.GetAngle();
-
+    // Activate Limelight Auto Align
     if (button_1.is_active())
-    {  
-        Limelight::retroreflective_auto_align(drive_train);
-    }
+    { Limelight::retroreflective_auto_align(drive_train); }
 
+    // Tries to Auto Level on the charging station
+    // if (auto_level_button.is_active())
+    // { gyro.auto_level(drive_train); }
 
+    // Toggle Limelight LED
     if (button_2.is_active())
     {  
-        std::cout << "Button 2" << std::endl;
+        std::cout << "Toggle LED" << std::endl;
 
-        if (Limelight::get_data("ledMode", 1) == 1)
-        {
-            Limelight::put_data("ledMode", 3);
-        }
-        else
-        {
-            Limelight::put_data("ledMode", 1);
-        }
+        Limelight::toggle_led();
     }
 
-    if (button_6.is_active()) {
-        
-        cout << "Button 6 Gyro Reset" << endl;
-
-        Gyro::imu.Reset();
-    }
-
-    if (upper_arm_button.is_active()) // Rotates Arm
+    // Switch Camera
+    if (button_6.is_active())
     {
-        cout << "upper arm moving" << endl;
+        // std::cout << "Change Camera from: " << server.GetSource().GetName() << std::endl;
 
-        Arm::target_angle += arm_joystick.get_y(0.15, 10); // Extends & Retracts Arm
+        // if (server.GetSource().GetName() == arm_camera.GetName())
+        // {
+        //     // camera_selection.SetString(front_camera.GetName());
+        //     server.SetSource(front_camera);
+        // }
+        // else
+        // {
+        //     // camera_selection.SetString(arm_camera.GetName());
+        //     server.SetSource(arm_camera);
+        // }
     }
 
-    if (lower_arm_button.is_active())
-    {
-        cout << "lower arm moving" << endl;
+    // Extension 6in for safe start distance
 
-        Arm::target_extension += arm_joystick.get_y(0.15, 1);
-    }
-
-    if (auto_arm_button.is_active())
-    {
-        cout << "In Autonomus" << endl;
-
-        Arm::cone_auto_place_high();
-    }
-
+    // Toggle Camera Mode
     if (button_3.is_active())
     {
-        cout << "Button 3 Velocity Reset" << endl;
+        cout << "Toggle Camera Mode" << endl;
 
-        Gyro::velocity.set(Vector3D::zero());
+        Limelight::toggle_camera();
     }
-    // std::cout << (double)imu.GetAngle() << std::endl;
 
-    Arm::update_extension();
-    Arm::update_rotation();
-    drive_train.update();
+    // frc::PowerDistribution::Faults current_fault = power_distribution_board.GetFaults(); // Channel 3
+
+    // frc::SmartDashboard::PutNumber("Power", arm.upper_arm_motor.GetOutputCurrent());
+
+    // Manual Arm Control
+
+    // if (arm.manual)
+    // {
+        // Arm Extension
+        if (lower_arm_button.is_active())
+        { 
+            arm.manual = true;
+
+            arm.set_direct_extend(arm_joystick.get_y(0.15, 1));
+        } 
+        else if (arm.manual)
+        { arm.set_direct_extend(0); }
+
+        // Arm Rotation
+        if (upper_arm_button.is_active())
+        {
+            arm.manual = true;
+
+            arm.set_direct_rotation(arm_joystick.get_y(0.15, 1));
+        }
+        else if (arm.manual)
+        { arm.set_direct_rotation(0); }
+
+        // Toggle Hand Grip
+        if (auto_arm_button.is_active())
+        { arm.hand_solenoid.Toggle(); }
+
+        // Toggle Pole
+        if (pole_arm_button.is_active())
+        { arm.pole_solenoid.Toggle(); }
+    // }
+
+    // arm.manual = false;
+
+    // Moves arm to position for high cone
+    if (move_to_high_button.is_active())
+    { 
+        cout << "Setup High Cone" << endl;
+
+        arm.move_to_high(); 
+    }
+
+    // Moves arm and extension to position for picking up
+    if (setup_grab_button.is_active())
+    { 
+        cout << "Setup Grab" << endl;
+
+        arm.move_to_grab();
+    }
+
+    // arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);
+    // arm.target_angle = frc::SmartDashboard::GetNumber("Target Rotation", POTENTIOMETER_OFFSET);
+
+    arm.periodic();
+    drive_train.periodic();
+
+    frc::SmartDashboard::PutNumber("Target Extension", arm.target_extension);
+    frc::SmartDashboard::PutNumber("Target Rotation", arm.target_angle);
+
+    frc::SmartDashboard::PutNumber("Encoder", arm.rotation());
+    frc::SmartDashboard::PutNumber("Poten Value", arm.extension());
+    frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.imu.GetAngle());
+
+    
+    posPls.PPP();
+
+    // std::cout << (double)imu.GetAngle() << std::endl;
 }
 
 void Robot::DisabledInit() {}

@@ -1,32 +1,74 @@
-
 #include "Limelight.h"
+#include <frc/smartdashboard/SmartDashboard.h>
+
+void Limelight::toggle_led(short toggle_type)
+{
+    switch (toggle_type)
+    {
+    case LED::ON:
+        Limelight::put_data("ledMode", 3);
+        break;
+    case LED::OFF:
+        Limelight::put_data("ledMode", 1);
+        break;
+    default:
+        if (Limelight::get_data("ledMode", 1) == 1)
+        {
+            Limelight::put_data("ledMode", 3);
+        }
+        else
+        {
+            Limelight::put_data("ledMode", 1);
+        }
+        break;
+    }
+}
+
+void Limelight::toggle_camera(short toggle_type)
+{
+    switch (toggle_type)
+    {
+    case CAM::COMPUTER:
+        Limelight::put_data("camMode", 0);
+        break;
+    case CAM::DRIVER:
+        Limelight::put_data("camMode", 1);
+        break;
+    default:
+        if (Limelight::get_data("camMode", 0) == 0)
+        {
+            Limelight::put_data("camMode", 1);
+        }
+        else
+        {
+            Limelight::put_data("camMode", 0);
+        }
+        break;
+    }
+}
 
 void Limelight::retroreflective_auto_align(Drive &drive)
 {
-    // put_data("pipeline", 0);
+    visible_target = get_data("tv", 0);
+    
+    horizontal_offset = get_data("tx", 0); // -27 degrees to 27 degrees (54 degrees)
+    vertical_offset = get_data("ty", 0); // -20.5 degrees to 20.5 degrees (41 degrees)
 
-    PID motion_pid{0.25, 0, 0};
-    Vector3D motion_limits{0.25, 0.25, 0.5};
+    vertical_offset += VERTICAL_DISTANCE_OFFSET;
 
-    double 
-    visible_target { get_data("tv", 0) },
-    horizontal_offset { get_data("tx", 0) }, // -27 degrees to 27 degrees (54 degrees)
-    vertical_offset {get_data("ty", 0)}, // -20.5 degrees to 20.5 degrees (41 degrees)
-    target_skew {get_data("ts", 0)},
-    target_area { get_data("ta", 0) };
-
-    if (visible_target == 1)
+    if (visible_target == 1) // If target is visible
     {  
         std::cout << "Target Found!" << std::endl;
 
-        double
-        percentage_horizontal_offset = horizontal_offset / 27,
-        percentage_vertical_offset = vertical_offset / 20.5,
-        percentage_skew_offset = target_skew;
+        percentage_horizontal_offset = horizontal_offset / 27;
+        percentage_vertical_offset = 0.4;
 
-        std::cout << percentage_skew_offset << std::endl;
+        // if (fabs(horizontal_offset) > 0.1)
+        // {
+        //     vertical_offset = 0;
+        // }
 
-        drive.speed.set(drive.speed.add(-percentage_vertical_offset * motion_pid.proportion, percentage_horizontal_offset * motion_pid.proportion, 0).minimum(motion_limits));
+        drive.speed += Vector2D{0, motion_PID_controller.Calculate(percentage_horizontal_offset, 0)};
     }
     else
     {

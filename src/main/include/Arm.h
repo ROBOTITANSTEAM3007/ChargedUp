@@ -1,31 +1,62 @@
 #pragma once
 
-// ARM LAYOUT
-// Hand Motor
-// Claw Pnumatic
-// Shoulder Motor
+// // ARM LAYOUT
+// // Hand Motor
+// // Claw Pnumatic
+// // Shoulder Motor
 
-// Shoulder Encoder
-// 
+// // Shoulder Encoder
+
 
 #include <frc/Solenoid.h>
 #include <frc/Encoder.h>
 #include <frc/DutyCycleEncoder.h>
-
+#include <frc/AnalogPotentiometer.h>
+#include <fstream>
+#include <frc/Joystick.h>
+#include <iostream>
 #include <rev/CANSparkMax.h>
+#include <frc/controller/PIDController.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "Vector2D.h"
-#include "Robot.h"
+#include "Limelight.h"
+#include "Drive.h"
 
 // Height limit is 78 inches
-#define UPPER_ARM_LENGTH 15.6 // inches
+// 52 Height rule limit
 
+// Robot Component Constants
+#define SHOULDER_HEIGHT 19.0 // inches
+#define UPPER_ARM_LENGTH 15.6 // inches
+#define RETRACTED_LOWER_ARM_LENGTH 23.7 //inches
+
+// Robot Sensor Constants
 #define MAX_ARM_EXTENSION 35.3 // inches
 #define MIN_ARM_EXTENSION 0 // inches
 
+#define POTENTIOMETER_OFFSET 0.14 // 0 - 1
+#define ENCODER_OFFSET 0.17 // 0 - 1
+
 #define MAX_ARM_ROTATION 360 // degrees
 #define MIN_ARM_ROTATION 0 // degrees
+
+#define ARM_EXTENSION_CONSTANT 44.24342102 // Was 0.0226022305, inches
+#define ARM_ROTATION_CONSTANT 360.00 // degrees
+
+#define SAFE_TARGET_EXTENSION 26.3 // inches 
+
+// Zones where gravity will impact the extension
+#define MIN_UNSAFE_EXTENSION_ZONE 45
+#define MAX_UNSAFE_EXTENSION_ZONE 130
+
+#define FREE_EXTENSION_POINT 140
+
+#define MOVMENT_SUCCESS_ZONE 0.01
+
+#define ROTATION_PID_ZONE 20 // Degrees
+#define EXTENSION_PID_ZONE 5 // Inches
 
 
 // NOTE!: 50in is the max length the arm can extend to stay inside the hight limit.
@@ -34,88 +65,102 @@
 //        35.3in is the maximum extension of the arm from 23.7in.
 class Arm {
     private:
-        //motors
-        static inline short
+        std::fstream fs;
+
+        // Sensor IDs
+        short 
+        extension_potentiometer_port { 0 },
+        shoulder_encoder_channel { 4 };
+
+        frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; //0V to 5V
+        frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
+
+        // Motor IDs
+        short
         upper_arm_motor_ID { 5 },
-        lower_left_arm_motor_ID { 6 },
-        lower_right_arm_motor_ID { 7 },
+        lower_arm_motor_ID { 6 };
 
-        //pneumatics
+        // Solenoid IDs
+        short
         hand_solenoid_channel { 0 },
+        pole_solenoid_channel { 4 };
 
-        //encoders
-        shoulder_encoder_channel { 0 };
+        // Potentiometer
+        double current_potentiometer_value, previous_potentiometer_value { 0 };
 
-        static inline frc::Solenoid hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel};
+        float ext[10];
 
-        static inline frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
+        double avrgExtension; 
+
+        short iterations = 0;
+
+        // Arm Calibration & Movment
+        double rotation_offset, extension_offset, safe_extension_offset;
+
+        double maxArmLength = 54.4;
+
+        float calibPoint1 = 0, calibPoint2 = 0;
+
+        float extensionSlope = 0;
+
+        float extensionLength; //measured in inches sadly.
 
     public:
-        static inline double 
-        target_extension{0}, // 0 - 35.3 inches
-        target_angle{0};
+        PID rotation_PID{0.02, 0, 0};
+        PID extension_PID{0.02, 0, 0};
+
+        frc2::PIDController rotation_PID_controller{rotation_PID.proportion, rotation_PID.integral, rotation_PID.derivative};
+        frc2::PIDController extension_PID_controller{extension_PID.proportion, extension_PID.integral, extension_PID.derivative};
+
+        Vector2D speed;
+        bool manual {true};
+
+        double target_extension{0}; // 0 - 35.3 inches
+        double target_angle{0};
 
         //declarations
-        static inline rev::CANSparkMax
+        rev::CANSparkMax
         upper_arm_motor{upper_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless},
-        lower_left_arm_motor{lower_left_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}, // NOTE!: left motor follows right motor!
-        lower_right_arm_motor{lower_right_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushless}; // Right motor leads.
+        lower_arm_motor{lower_arm_motor_ID, rev::CANSparkMax::MotorType::kBrushed};
 
-        static void reset_encoder()
-        { encoder.Reset();}
+        frc::Solenoid 
+        hand_solenoid{frc::PneumaticsModuleType::CTREPCM, hand_solenoid_channel},
+        pole_solenoid{frc::PneumaticsModuleType::CTREPCM, pole_solenoid_channel};
 
-        static double rotation()
-        { return encoder.GetAbsolutePosition() * 360; } // Degrees
+        Arm();
+
+        double rotation();
         
-        static double extension()
-        { return /*extension measurment here*/ 0;}
+        double extension();
 
-        static double distance()
-        { return sqrt(pow(/*arm extension*/1, 2) * pow(UPPER_ARM_LENGTH, 2)); }
+        double potentiometer_value();
 
-        static void cone_auto_place_high()
-        {
-            target_angle = /*Correct Angle Here*/0;
-            bool finished_rotation {update_rotation()};
+        double distance();
 
-            if (finished_rotation)
-            {
-                target_extension = /*Correct Extension Here*/0;
-                bool finished_extension {update_extension()};
-                if (finished_extension)
-                {
-                    hand_solenoid.Set(true); // Relases claw
-                }
-            }
-        }
+        double height();
 
-        static bool update_extension()
-        {
-            double extension_offset{fmax(fmin(target_extension, MAX_ARM_EXTENSION), MIN_ARM_EXTENSION) - extension()};
+        void update_average_extension(double);
 
-            lower_right_arm_motor.Set(fmin(extension_offset, 1));
+        void calibrate(frc::Joystick *stick); //Linear regression from arm at shortest and longest extension
+ 
 
-            if (fabs(extension_offset) < 0.01)
-            {
-                std::cout << "Correct Extension" << extension() << std::endl;
-                return true;
-            }
+        void set_direct_extend(float);
 
-            return false;
-        }
+        void set_direct_rotation(float);
 
-        static bool update_rotation()
-        {
-            double angle_offset{fmax(fmin(target_angle, MAX_ARM_ROTATION), MIN_ARM_ROTATION) - rotation()};
+        void periodic();
 
-            upper_arm_motor.Set(fmin(angle_offset, 1));
 
-            if (fabs(angle_offset) < 0.01)
-            {
-                std::cout << "Correct Rotation" << rotation() << std::endl;
-                return true;
-            }
+        void move_to_high();
+        void move_to_grab();
 
-            return false;
-        }
+
+        void cone_auto_place_mid();
+
+        void cube_auto_place_mid();
+
+        void cube_auto_place_high();
+
+        void cone_auto_place_high(Drive &);
+
 };  
