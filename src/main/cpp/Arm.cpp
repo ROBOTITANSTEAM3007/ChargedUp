@@ -133,19 +133,6 @@ void Arm::periodic() {
         // Turns manual off when in correct locations.
         // if (fabs(rotation_offset) <= MOVMENT_SUCCESS_ZONE && fabs(extension_offset) <= MOVMENT_SUCCESS_ZONE)
         // { this->manual = true; }
-
-
-        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
-        {
-            hand_solenoid.Set(true);
-
-            finished_cone_placment = true;
-        }
-
-        if (!finished_forward_drive)
-        {
-
-        };
     }
 
     speed = speed.maximum(-1).minimum(1);
@@ -194,6 +181,13 @@ void Arm::cone_auto_place_high(Drive &drive) {
         if (!finished_cone_placment)
         {
             move_to_high_cone();
+
+            if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
+            {
+                hand_solenoid.Set(true);
+
+                finished_cone_placment = true;
+            }
         }
         else if (!finished_forward_drive)
         {
@@ -227,17 +221,6 @@ void Arm::cone_auto_place_mid(Drive &drive) {
     // this->target_extension = 0;
 }
 
-void Arm::cube_auto_place_high(Drive &drive) {
-    // auto_
-}
-
-void Arm::cube_auto_place_mid(Drive &drive) {
-    this->manual = false;
-    this->target_angle = 0;//Change ME!!!
-    this->target_extension = 0;
-}
-
-
 void Arm::move_to_mid_cone()
 {
     this->manual = false;
@@ -250,7 +233,7 @@ void Arm::move_to_high_cone()
 {
     this->manual = false;
 
-    this->target_angle = 164;
+    this->target_angle = 162;
     this->target_extension = 33.0;
 }
 

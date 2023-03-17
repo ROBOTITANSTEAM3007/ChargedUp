@@ -45,9 +45,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Rotation I", arm.rotation_PID.integral);
     frc::SmartDashboard::PutNumber("Rotation D", arm.rotation_PID.derivative);
 
-    frc::SmartDashboard::PutNumber("Leveling P", gyro.gyro_PID.proportion);
-    frc::SmartDashboard::PutNumber("Leveling I", gyro.gyro_PID.integral);
-    frc::SmartDashboard::PutNumber("Leveling D", gyro.gyro_PID.derivative);
+    frc::SmartDashboard::PutNumber("Change Constant", gyro.change_constant);
 
     frc::SmartDashboard::PutNumber("Auto Drive Time", 0);
 
@@ -82,7 +80,8 @@ void Robot::RobotInit() {
  */
 void Robot::RobotPeriodic()
 {
-    frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.imu.GetAngle());
+    frc::SmartDashboard::PutNumber("IMU Angle", (double)gyro.linear_filter);
+    frc::SmartDashboard::PutNumber("IMU Delta Angle", (double)gyro.delta_angle);
 }
 
 /**
@@ -124,23 +123,16 @@ void Robot::AutonomousPeriodic() {
         drive_train.speed = Vector2D{0.8, 0};
     }
 
-    // if (selected_auto == auto_profile_testing) {
+    if (selected_auto == auto_profile_testing) {
         
-    // } else if (selected_auto == cone_high) {
-    //     arm.cone_auto_place_high(drive_train);
+    } else if (selected_auto == cone_high) {
+        arm.cone_auto_place_high(drive_train);
 
-    // } else if (selected_auto == cone_mid) {
-    //     arm.cone_auto_place_mid(drive_train);
-
-    // } else if (selected_auto == cube_high) {
-    //     arm.cube_auto_place_high(drive_train);
-
-    // } else if (selected_auto == cube_high) {
-    //     arm.cube_auto_place_mid(drive_train);
-
-    // } else {
-    //     // Default Auto goes here
-    // }
+    } else if (selected_auto == cone_mid) {
+        arm.cone_auto_place_mid(drive_train);
+    } else {
+        // Default Auto goes here
+    }
 
     // else if (selected_auto == auto_profile_testing) {
     //     // Custom Auto goes here
@@ -251,6 +243,14 @@ void Robot::TeleopPeriodic() {
         cout << "Setup High Cone" << endl;
 
         arm.move_to_high_cone(); 
+    }
+
+    // Moves arm to position for mid cone
+    if (move_to_mid_button.is_active())
+    { 
+        cout << "Setup Mid Cone" << endl;
+
+        arm.move_to_mid_cone(); 
     }
 
     // Moves arm and extension to position for picking up

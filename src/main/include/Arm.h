@@ -74,7 +74,7 @@ class Arm {
         // Sensor IDs
         short 
         extension_potentiometer_port { 4 },
-        shoulder_encoder_channel { 14 };
+        shoulder_encoder_channel { 10 };
 
         frc::AnalogPotentiometer extension_potentiometer{extension_potentiometer_port}; //0V to 5V
         frc::DutyCycleEncoder encoder{shoulder_encoder_channel};
@@ -162,10 +162,6 @@ class Arm {
 
 
         void cone_auto_place_mid(Drive &);
-
-        void cube_auto_place_mid(Drive &);
-
-        void cube_auto_place_high(Drive &);
 
         void cone_auto_place_high(Drive &);
 
