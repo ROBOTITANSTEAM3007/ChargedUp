@@ -7,23 +7,7 @@ Gyro::Gyro()
 
 void Gyro::auto_level(Drive &drive)
 {
-  change_constant = frc::SmartDashboard::GetNumber("Change Constant", 0);
-  
   current_angle = (double)Gyro::imu.GetAngle();
 
-  linear_filter = change_constant * linear_filter + (1 - change_constant) * current_angle;
-
-  delta_angle = linear_filter - previous_angle;
-
-  if (fabs(current_angle) > 10 && abs(delta_angle) < 0.25)
-  {
-    drive.speed = Vector2D{std::clamp(gyro_PID_controller.Calculate(current_angle, 0), -0.40, 0.40), 0};
-  }
-
-  previous_angle = current_angle;
-}
-
-void Gyro::reset()
-{
-  Gyro::imu.Reset();
+  drive.speed += Vector2D{-current_angle * 0.5, 0};
 }

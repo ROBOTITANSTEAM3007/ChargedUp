@@ -16,22 +16,13 @@
 class Gyro
 {
 private:
+    double current_angle;
 
 public:
-    double current_angle, previous_angle {0};
-    double linear_filter;
-
-    double change_constant {0.2};
-    double delta_angle;
-
     // IMU
     frc::ADIS16470_IMU imu;
-
-    PID gyro_PID{0.05, 0.003, 0};
-    frc2::PIDController gyro_PID_controller{gyro_PID.proportion, gyro_PID.integral, gyro_PID.derivative};
 
     Gyro();
 
     void auto_level(Drive &);
-    void reset();
 };
