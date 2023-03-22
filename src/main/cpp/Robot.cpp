@@ -129,7 +129,7 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {
     if (selected_auto == auto_profile_whole_hog) {
-        drive_train.speed = Vector2D{1, 0};
+        drive_train.speed = Vector2D{0.99, 0};
     }
 
     if (selected_auto == auto_profile_testing) {
@@ -139,27 +139,24 @@ void Robot::AutonomousPeriodic() {
 
     } else if (selected_auto == cone_mid) {
         arm.cone_auto_place_mid(drive_train);
-    } else if (selected_auto == dock) {
-        if(arm.cone_auto_place_high(drive_train)){
-            if (position.spinPP() < 75){
-                drive_train.speed = Vector2D(0.65, 0);
-            } else {
+
+    } 
+    else if (selected_auto == dock) 
+    {
+        if (arm.cone_auto_place_high(drive_train))
+        {
+            if (position.spinPP() < 73)
+            {
+                drive_train.speed = Vector2D(0.6, 0);
+            }
+            else 
+            {
                 gyro.auto_level(drive_train);
             }
-        }
-        
+        }  
     } else {
         // Default Auto goes here
     }
-
-    // else if (selected_auto == auto_profile_testing) {
-    //     // Custom Auto goes here
-    // } 
-    // else {
-    //     // Default Auto goes here
-    //     // autonomus_place_cone();
-    //     arm.cone_auto_place_high(drive_train);
-    // }
 
     arm.periodic();
     drive_train.periodic();

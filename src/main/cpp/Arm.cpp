@@ -171,59 +171,48 @@ void Arm::set_direct_extend(float input)
 
 
 bool Arm::cone_auto_place_high(Drive &drive) {
-    // Limelight::toggle_led(LED::ON);
+    frc::SmartDashboard::PutNumber("poten diff", extension_offset);
+    frc::SmartDashboard::PutNumber("poten ext", rotation_offset);
 
-    // Limelight::retroreflective_auto_align(drive);
+    if (!finished_cone_placment)
+    {
+        move_to_high_cone();
 
-    // if (Limelight::vertical_offset < 0.05 && Limelight::horizontal_offset < 0.05)
-    // {    
+        this->target_angle = 164;
 
-        if (!finished_cone_placment)
+        rotation_offset = (target_angle - rotation()) / ARM_ROTATION_CONSTANT;
+        extension_offset = (target_extension - extension()) / ARM_EXTENSION_CONSTANT;
+
+        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
         {
-            move_to_high_cone();
+            hand_solenoid.Set(true);
 
-            if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
-            {
-                hand_solenoid.Set(true);
-
-                finished_cone_placment = true;
-                i=0;
-            }
+            finished_cone_placment = true;
         }
-        else if (finished_cone_placment = true)
+
+        return false;
+    }
+    else if (finished_cone_placment && !finished_arm_reset)
+    {
+        move_to_grab();
+
+        this->target_angle = 10;
+        
+        rotation_offset = (target_angle - rotation()) / ARM_ROTATION_CONSTANT;
+        extension_offset = (target_extension - extension()) / ARM_EXTENSION_CONSTANT;
+
+        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
         {
-            move_to_grab();
-            i++;
-            if(i < 100) {
-                return true;
-            }
+            finished_arm_reset =  true;
         }
-    // }
-    return false;
+
+        return false;
+    }
+
+    return true;
 }
 
 void Arm::cone_auto_place_mid(Drive &drive) {
-    if (!finished_cone_placment)
-        {
-            move_to_mid_cone();
-
-            if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
-            {
-                hand_solenoid.Set(true);
-
-                finished_cone_placment = true;
-            }
-        }
-        else
-        {
-            move_to_grab();
-
-            drive.speed += Vector2D{0.3, 0};
-        }
-
-    // this->manual = false;
-    // this->target_angle = 0;//Change ME!!!
-    // this->target_extension = 0;
 }
 
 void Arm::move_to_mid_cone()
@@ -238,7 +227,7 @@ void Arm::move_to_high_cone()
 {
     this->manual = false;
 
-    this->target_angle = 162;
+    this->target_angle = 164;
     this->target_extension = 33.0;
 }
 
@@ -246,7 +235,7 @@ void Arm::move_to_grab()
 {
     this->manual = false;
 
-    this->target_angle = 0;
-    this->target_extension = 4.0;
+    this->target_angle = 3;
+    this->target_extension = 6.0;
     this->hand_solenoid.Set(true);
 }
