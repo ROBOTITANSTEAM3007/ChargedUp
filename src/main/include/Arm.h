@@ -53,7 +53,7 @@
 
 #define FREE_EXTENSION_POINT 140
 
-#define MOVMENT_SUCCESS_ZONE 0.01
+#define MOVMENT_SUCCESS_ZONE 0.05
 
 #define ROTATION_PID_ZONE 20 // Degrees
 #define EXTENSION_PID_ZONE 5 // Inches
@@ -66,10 +66,6 @@
 class Arm {
     private:
         std::fstream fs;
-
-        // Stages
-        bool finished_cone_placment {false};
-        bool finished_forward_drive {false};
 
         // Sensor IDs
         short 
@@ -112,6 +108,10 @@ class Arm {
         float extensionLength; //measured in inches sadly.
 
     public:
+        // Stages
+        bool finished_cone_placment {false};
+        bool finished_arm_reset {false};
+
         PID rotation_PID{0.02, 0, 0};
         PID extension_PID{0.3, 0, 0};
 
