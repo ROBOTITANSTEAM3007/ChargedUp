@@ -166,12 +166,10 @@ class Robot : public frc::TimedRobot {
     private:
         frc::SendableChooser<std::string> auto_chooser;
         const std::string auto_profile_default = "Default";
-        const std::string auto_profile_testing = "Chill";
         const std::string auto_profile_whole_hog = "No Chill";
         const std::string cone_high = "High As A Cone";
-        const std::string cube_high = "Don't Be Square Man";
         const std::string cone_mid = "Pretty Mid Cone Der Bud";
-        const std::string cube_mid = "Sure Of Course A Square like You Would Make That Kind Of Mid Decission";
         const std::string dock = "Dock";
+        const std::string runAway = "Run Away!";
         std::string selected_auto;
 };

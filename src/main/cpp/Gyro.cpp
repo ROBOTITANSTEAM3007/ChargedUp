@@ -15,9 +15,14 @@ void Gyro::auto_level(Drive &drive)
 
   delta_angle = linear_filter - previous_angle;
 
-  if (fabs(current_angle) > 10 && abs(delta_angle) < 0.25)
+  if (fabs(current_angle) > 10 && fabs(delta_angle) < 0.25)
   {
-    drive.speed = Vector2D{std::clamp(-linear_filter, -0.40, 0.40), drive.speed.y};
+    drive.speed = Vector2D{std::clamp(-linear_filter, -0.45, 0.45
+    ), drive.speed.y};
+  }
+  else
+  {
+    drive.speed = Vector2D{0, drive.speed.y};
   }
 
   previous_angle = current_angle;

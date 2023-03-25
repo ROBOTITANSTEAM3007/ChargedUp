@@ -25,13 +25,11 @@ void Robot::RobotInit() {
     debug.out("Set Connection Strategy");
 
     auto_chooser.SetDefaultOption(auto_profile_default, auto_profile_default);
-    auto_chooser.AddOption(auto_profile_testing, auto_profile_testing);
     auto_chooser.AddOption(auto_profile_whole_hog, auto_profile_whole_hog);
     auto_chooser.AddOption(cone_high, cone_high);
     auto_chooser.AddOption(cone_mid, cone_mid);
-    auto_chooser.AddOption(cube_high, cube_high);
+    auto_chooser.AddOption(runAway, runAway);
     auto_chooser.AddOption(dock, dock);
-    auto_chooser.AddOption(cube_mid, cube_high);
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
@@ -104,9 +102,7 @@ void Robot::AutonomousInit() {
     selected_auto = auto_chooser.GetSelected();
     //selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
 
-    if (selected_auto == auto_profile_testing) {
-        
-    } else if (selected_auto == cone_high) {
+    if (selected_auto == cone_high) {
         arm.cone_auto_place_high(drive_train);
     } else if (selected_auto == dock) {
         position.pos.y = 0;
@@ -127,13 +123,11 @@ void Robot::AutonomousInit() {
     debug.out("Selected Auto = " + selected_auto);
 }
 
+bool finiForwardy = false;
+
 void Robot::AutonomousPeriodic() {
     if (selected_auto == auto_profile_whole_hog) {
         drive_train.speed = Vector2D{0.99, 0};
-    }
-
-    if (selected_auto == auto_profile_testing) {
-        
     } else if (selected_auto == cone_high) {
         arm.cone_auto_place_high(drive_train);
 
@@ -145,16 +139,33 @@ void Robot::AutonomousPeriodic() {
     {
         if (arm.cone_auto_place_high(drive_train))
         {
-            if (position.spinPP() < 73)
+            if (position.spinPP() < 73 && finiForwardy == false)
             {
                 drive_train.speed = Vector2D(0.6, 0);
+
+            }  else {
+                finiForwardy = true;
             }
-            else 
+
+            if (finiForwardy == true)
             {
+
                 gyro.auto_level(drive_train);
             }
         }  
-    } else {
+    } else if (selected_auto == runAway) {
+        if (arm.cone_auto_place_high(drive_train))
+        {
+            if (position.spinPP() < 192)
+            {
+                drive_train.speed = Vector2D(0.6, 0);
+            } else {
+                drive_train.speed = Vector2D(0,0);
+            }
+
+        }  
+    }
+    else {
         // Default Auto goes here
     }
 

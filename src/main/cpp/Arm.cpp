@@ -94,7 +94,7 @@ void Arm::periodic() {
     rotation_PID_controller.SetD(frc::SmartDashboard::GetNumber("Rotation D", rotation_PID.derivative));
 
     frc::SmartDashboard::PutNumber("poten diff", extension_offset);
-    frc::SmartDashboard::PutNumber("poten ext", rotation_offset);
+    frc::SmartDashboard::PutNumber("Rotation Offset", rotation_offset);
 
     // Run Manual
     if(!manual){
@@ -182,6 +182,7 @@ bool Arm::cone_auto_place_high(Drive &drive) {
 
         rotation_offset = (target_angle - rotation()) / ARM_ROTATION_CONSTANT;
         extension_offset = (target_extension - extension()) / ARM_EXTENSION_CONSTANT;
+        frc::SmartDashboard::PutNumber("Rotation Offset", rotation_offset);
 
         if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
         {
@@ -196,8 +197,6 @@ bool Arm::cone_auto_place_high(Drive &drive) {
     {
         move_to_grab();
 
-        this->target_angle = 10;
-        
         rotation_offset = (target_angle - rotation()) / ARM_ROTATION_CONSTANT;
         extension_offset = (target_extension - extension()) / ARM_EXTENSION_CONSTANT;
 
@@ -227,7 +226,7 @@ void Arm::move_to_high_cone()
 {
     this->manual = false;
 
-    this->target_angle = 164;
+    this->target_angle = 166;
     this->target_extension = 33.0;
 }
 
@@ -235,7 +234,7 @@ void Arm::move_to_grab()
 {
     this->manual = false;
 
-    this->target_angle = 3;
+    this->target_angle = 10;
     this->target_extension = 6.0;
     this->hand_solenoid.Set(true);
 }
