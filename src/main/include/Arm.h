@@ -45,7 +45,7 @@
 #define ARM_EXTENSION_CONSTANT 44.24342102 // Was 0.0226022305, inches
 #define ARM_ROTATION_CONSTANT 360.00 // degrees
 
-#define SAFE_TARGET_EXTENSION 30.0 // inches 
+#define SAFE_TARGET_EXTENSION 29.0 // inches 
 
 // Zones where gravity will impact the extension
 #define MIN_UNSAFE_EXTENSION_ZONE 45
@@ -56,7 +56,7 @@
 #define MOVMENT_SUCCESS_ZONE 0.05
 
 #define ROTATION_PID_ZONE 20 // Degrees
-#define EXTENSION_PID_ZONE 5 // Inches
+#define EXTENSION_PID_ZONE 3 // Inches
 
 
 // NOTE!: 50in is the max length the arm can extend to stay inside the hight limit.
@@ -161,9 +161,12 @@ class Arm {
         void move_to_mid_cone();
 
         void move_to_grab();
+        void move_to_drive();
+        void move_to_station();
+        void grab_backward();
 
 
-        void cone_auto_place_mid(Drive &);
+        bool cone_auto_place_mid(Drive &);
 
         bool cone_auto_place_high(Drive &);
 

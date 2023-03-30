@@ -161,6 +161,10 @@ class Robot : public frc::TimedRobot {
         Button move_to_mid_button{12, arm_joystick.object, PRESS};
         Button setup_grab_button{5, arm_joystick.object, PRESS};
 
+        Button drive_position_button{9, arm_joystick.object, PRESS};
+        Button station_grab_button{10, arm_joystick.object, PRESS};
+        Button grab_backward_button{8, arm_joystick.object, PRESS};
+
         double time_remaining {0};
 
     private:
@@ -169,7 +173,11 @@ class Robot : public frc::TimedRobot {
         const std::string auto_profile_whole_hog = "No Chill";
         const std::string cone_high = "High As A Cone";
         const std::string cone_mid = "Pretty Mid Cone Der Bud";
-        const std::string dock = "Dock";
-        const std::string runAway = "Run Away!";
+
+        const std::string dock_high = "Dock High";
+        const std::string runAway_high = "Run Away High!";
+
+        const std::string dock_mid = "Dock Mid";
+        const std::string runAway_mid = "Run Away Mid!";
         std::string selected_auto;
 };
