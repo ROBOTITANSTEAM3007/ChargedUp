@@ -28,8 +28,12 @@ void Robot::RobotInit() {
     auto_chooser.AddOption(auto_profile_whole_hog, auto_profile_whole_hog);
     auto_chooser.AddOption(cone_high, cone_high);
     auto_chooser.AddOption(cone_mid, cone_mid);
-    auto_chooser.AddOption(runAway, runAway);
-    auto_chooser.AddOption(dock, dock);
+
+    auto_chooser.AddOption(runAway_high, runAway_high);
+    auto_chooser.AddOption(dock_high, dock_high);
+
+    auto_chooser.AddOption(runAway_mid, runAway_mid);
+    auto_chooser.AddOption(dock_mid, dock_mid);
 
     frc::SmartDashboard::PutData("Auto Modes", &auto_chooser);
 
@@ -102,21 +106,15 @@ void Robot::AutonomousInit() {
     selected_auto = auto_chooser.GetSelected();
     //selected_auto = frc::SmartDashboard::GetString("Auto Selector", auto_profile_default); // Retrieves data from networktables & returns autotype, Default: kAutoNameDefault
 
+    position.pos.y = 0;
+    gyro.reset();
+
     if (selected_auto == cone_high) {
         arm.cone_auto_place_high(drive_train);
-    } else if (selected_auto == dock) {
-        position.pos.y = 0;
-        gyro.reset();
+    } else if (selected_auto == dock_high) {
+        // position.pos.y = 0;
+        // gyro.reset();
     }
-    // } else if (selected_auto == cone_mid) {
-    //     arm.cone_auto_place_mid();
-
-    // } else if (selected_auto == cube_high) {
-    //     arm.cube_auto_place_high();
-
-    // } else if (selected_auto == cube_high) {
-    //     arm.cube_auto_place_mid();
-
     else {
         // Default Auto goes here
     }
@@ -135,7 +133,7 @@ void Robot::AutonomousPeriodic() {
         arm.cone_auto_place_mid(drive_train);
 
     } 
-    else if (selected_auto == dock) 
+    else if (selected_auto == dock_high) 
     {
         if (arm.cone_auto_place_high(drive_train))
         {
@@ -153,8 +151,38 @@ void Robot::AutonomousPeriodic() {
                 gyro.auto_level(drive_train);
             }
         }  
-    } else if (selected_auto == runAway) {
+    } else if (selected_auto == runAway_high) {
         if (arm.cone_auto_place_high(drive_train))
+        {
+            if (position.spinPP() < 192)
+            {
+                drive_train.speed = Vector2D(0.6, 0);
+            } else {
+                drive_train.speed = Vector2D(0,0);
+            }
+
+        }  
+    }
+    else if (selected_auto == dock_mid) 
+    {
+        if (arm.cone_auto_place_mid(drive_train))
+        {
+            if (position.spinPP() < 73 && finiForwardy == false)
+            {
+                drive_train.speed = Vector2D(0.6, 0);
+
+            }  else {
+                finiForwardy = true;
+            }
+
+            if (finiForwardy == true)
+            {
+
+                gyro.auto_level(drive_train);
+            }
+        }  
+    } else if (selected_auto == runAway_mid) {
+        if (arm.cone_auto_place_mid(drive_train))
         {
             if (position.spinPP() < 192)
             {
@@ -184,8 +212,8 @@ void Robot::TeleopPeriodic() {
     };*/
     Vector2D
     {
-        -to_sigmoidal(drive_joystick.get_y(0.2, 1.0), 10),
-        -to_sigmoidal(drive_joystick.get_twist(0.3, 0.8), 10)
+        -to_sigmoidal(drive_joystick.get_y(0.15, 1.0), 10),
+        -to_sigmoidal(drive_joystick.get_twist(0.15, 0.8), 10)
     };
     
     // cout << to_sigmoidal(drive_joystick.get_twist(0, 1.0), 10) << endl;
@@ -293,6 +321,26 @@ void Robot::TeleopPeriodic() {
         debug.out("Setup Grab");
 
         arm.move_to_grab();
+    }
+
+    if (station_grab_button.is_active())
+    {
+        debug.out("Setup Station");
+        arm.move_to_station();
+    }
+
+    if (drive_position_button.is_active())
+    {
+        debug.out("Setup Drive");
+        
+        arm.move_to_drive();
+    }
+
+    if (grab_backward_button.is_active())
+    {
+        debug.out("Setup Backwards");
+
+        arm.grab_backward();
     }
 
     // arm.target_extension = frc::SmartDashboard::GetNumber("Target Extension", 0.2);

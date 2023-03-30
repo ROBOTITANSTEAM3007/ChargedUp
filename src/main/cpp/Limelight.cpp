@@ -3,6 +3,8 @@
 
 void Limelight::toggle_led(short toggle_type)
 {
+    Limelight::put_data("pipeline", 0);
+
     switch (toggle_type)
     {
     case LED::ON:
@@ -29,19 +31,19 @@ void Limelight::toggle_camera(short toggle_type)
     switch (toggle_type)
     {
     case CAM::COMPUTER:
-        Limelight::put_data("camMode", 0);
+        Limelight::put_data("pipeline", 0);
         break;
     case CAM::DRIVER:
-        Limelight::put_data("camMode", 1);
+        Limelight::put_data("pipeline", 1);
         break;
     default:
-        if (Limelight::get_data("camMode", 0) == 0)
+        if (Limelight::get_data("pipeline", 0) == 0)
         {
-            Limelight::put_data("camMode", 1);
+            Limelight::put_data("pipeline", 1);
         }
         else
         {
-            Limelight::put_data("camMode", 0);
+            Limelight::put_data("pipeline", 0);
         }
         break;
     }

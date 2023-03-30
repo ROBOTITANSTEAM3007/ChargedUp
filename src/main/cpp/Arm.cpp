@@ -211,14 +211,52 @@ bool Arm::cone_auto_place_high(Drive &drive) {
     return true;
 }
 
-void Arm::cone_auto_place_mid(Drive &drive) {
+bool Arm::cone_auto_place_mid(Drive &drive) {
+    frc::SmartDashboard::PutNumber("poten diff", extension_offset);
+    frc::SmartDashboard::PutNumber("poten ext", rotation_offset);
+
+    if (!finished_cone_placment)
+    {
+        move_to_mid_cone();
+
+        // this->target_angle = 164;
+
+        rotation_offset = (target_angle - rotation()) / ARM_ROTATION_CONSTANT;
+        extension_offset = (target_extension - extension()) / ARM_EXTENSION_CONSTANT;
+        frc::SmartDashboard::PutNumber("Rotation Offset", rotation_offset);
+
+        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
+        {
+            hand_solenoid.Set(true);
+
+            finished_cone_placment = true;
+        }
+
+        return false;
+    }
+    else if (finished_cone_placment && !finished_arm_reset)
+    {
+        move_to_grab();
+
+        rotation_offset = (target_angle - rotation()) / ARM_ROTATION_CONSTANT;
+        extension_offset = (target_extension - extension()) / ARM_EXTENSION_CONSTANT;
+
+        if (fabs(rotation_offset) < MOVMENT_SUCCESS_ZONE && fabs(extension_offset) < MOVMENT_SUCCESS_ZONE)
+        {
+            finished_arm_reset =  true;
+        }
+
+        return false;
+    }
+
+    return true;
 }
 
 void Arm::move_to_mid_cone()
 {
     this->manual = false;
 
-    this->target_angle = 177;
+    this->target_angle = 176;
     this->target_extension = 14.7;
 }
 
@@ -235,6 +273,31 @@ void Arm::move_to_grab()
     this->manual = false;
 
     this->target_angle = 10;
-    this->target_extension = 6.0;
+    this->target_extension = 15.0;
+}
+
+void Arm::move_to_drive()
+{
+    this->manual = false;
+
+    this->target_angle = 68;
+    this->target_extension = extension();
+}
+
+void Arm::move_to_station()
+{
+    this->manual = false;
+
+    this->target_angle = 167;
+    this->target_extension = 10.0;
     this->hand_solenoid.Set(true);
+}
+
+void Arm::grab_backward()
+{
+    this->manual = false;
+
+    this->target_angle = 223;
+    this->target_extension = 21.2;
+    // this->hand_solenoid.Set(true);
 }
